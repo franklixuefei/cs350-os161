@@ -5,6 +5,9 @@
 #ifndef _SYNCH_H_
 #define _SYNCH_H_
 #include "opt-A1.h"
+#if OPT_A1
+#include <queue.h>
+#endif
 /*
  * Dijkstra-style semaphore.
  * Operations:
@@ -94,6 +97,10 @@ void         lock_destroy(struct lock *);
 struct cv {
 	char *name;
 	// add what you need here
+	#if OPT_A1
+	volatile int count;
+	volatile struct queue *queue;
+	#endif
 	// (don't forget to mark things volatile as needed)
 };
 

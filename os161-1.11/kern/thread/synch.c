@@ -195,7 +195,7 @@ lock_do_i_hold(struct lock *lock)
 	#if OPT_A1
 	return lock->origThread == curthread;
 	#else
-	//return 1;    // dummy until code gets written
+	return 1;    // dummy until code gets written
 	#endif /* OPT_A1 */
 }
 
@@ -221,7 +221,10 @@ cv_create(const char *name)
 	}
 	
 	// add stuff here as needed
-	
+	#if OPT_A1
+	cv->count = 0;
+	cv->queue = q_create(1);
+	#endif
 	return cv;
 }
 
@@ -231,23 +234,59 @@ cv_destroy(struct cv *cv)
 	assert(cv != NULL);
 
 	// add stuff here as needed
-	
+	#if OPT_A1
+	assert(cv->count==0);
+	q_destroy(cv->queue);
+	#endif
 	kfree(cv->name);
 	kfree(cv);
+	#if OPT_A1
+	cv = NULL;
+	#endif
 }
 
 void
 cv_wait(struct cv *cv, struct lock *lock)
 {
 	// Write this
+	#if OPT_A1
+	int spl;
+	spl = splhigh();
+	assert(cv!=NULL && lock!=NULL);
+	assert(lock_do_i_hold(lock)); // not neccesary because lock_release() has this assertion inside of it.
+
+	assert(q_preallocate(cv->queue, cv->count+1)==0); // realloc the queue to bigger size;
+	assert(q_addtail(cv->queue, curthread)==0); // enqueue the curthread.
+
+	cv->count++;
+	
+	lock_release(lock); // do this because if a thread called cv_wait, it means that a particular condition
+			    // not true.
+	thread_sleep(curthread);
+	
+	lock_acquire(lock);
+	splx(spl);
+	#else
 	(void)cv;    // suppress warning until code gets written
 	(void)lock;  // suppress warning until code gets written
+	#endif
 }
 
 void
 cv_signal(struct cv *cv, struct lock *lock)
 {
 	// Write this
+	#if OPT_A1
+	int spl;
+	spl = splhigh();
+	assert(cv!=NULL && lock!=NULL);
+	assert(lock_do_i_hold(lock));
+	assert(cv->count > 0); // ensure that there are guys awaiting.
+	struct thread *front = q_remhead(cv->queue);
+	cv->count--;
+	thread_wakeup(front);
+	splx(spl);
+	#endif
 	(void)cv;    // suppress warning until code gets written
 	(void)lock;  // suppress warning until code gets written
 }
@@ -256,6 +295,17 @@ void
 cv_broadcast(struct cv *cv, struct lock *lock)
 {
 	// Write this
+	#if OPT_A1
+	int spl;
+	spl = splhigh();
+	assert(cv!=NULL && lock!=NULL);
+	while(cv->count>0) {
+	   cv_signal(cv, lock);
+	}
+	assert(cv->count == 0);
+	splx(spl);
+	#else
 	(void)cv;    // suppress warning until code gets written
 	(void)lock;  // suppress warning until code gets written
+	#endif
 }
