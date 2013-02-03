@@ -284,7 +284,7 @@ hardclock.o: ../../thread/hardclock.c ../../include/types.h \
 synch.o: ../../thread/synch.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/lib.h \
   machine/setjmp.h ../../include/synch.h opt-A1.h ../../include/thread.h \
-  machine/pcb.h ../../include/curthread.h machine/spl.h
+  machine/pcb.h ../../include/curthread.h machine/spl.h opt-A1.h
 scheduler.o: ../../thread/scheduler.c ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/lib.h machine/setjmp.h ../../include/scheduler.h \
@@ -367,6 +367,11 @@ fstest.o: ../../test/fstest.c ../../include/types.h machine/types.h \
 hello.o: ../../main/hello.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/lib.h \
   machine/setjmp.h
+foodcourt.o: ../../asst1/foodcourt.c ../../include/types.h \
+  machine/types.h ../../include/kern/types.h machine/ktypes.h \
+  ../../include/lib.h machine/setjmp.h ../../include/test.h \
+  ../../include/thread.h machine/pcb.h ../../include/synch.h opt-A1.h \
+  opt-A1.h
 uw-vmstats.o: ../../vm/uw-vmstats.c opt-A3.h
 autoconf.o: ../../compile/ASST0/autoconf.c ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \

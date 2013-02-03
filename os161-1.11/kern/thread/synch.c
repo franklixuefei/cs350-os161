@@ -137,7 +137,7 @@ lock_destroy(struct lock *lock)
 	assert(lock != NULL);
 	
 	//spl = splhigh();
-	assert(lock->held);
+	assert(!lock->held);
 	assert(lock->origThread == NULL);
 	//assert(thread_hassleepers(lock) == 0);
 	//splx(spl);
@@ -179,7 +179,7 @@ lock_release(struct lock *lock)
 	assert(lock != NULL);
 	spl = splhigh();
 	assert(lock_do_i_hold(lock));
-	lock->origThread == NULL;
+	lock->origThread = NULL;
 	lock->held = 0;
 	thread_wakeup(lock);
 	splx(spl);
@@ -255,10 +255,12 @@ cv_wait(struct cv *cv, struct lock *lock)
 	assert(cv!=NULL && lock!=NULL);
 	assert(lock_do_i_hold(lock)); // not neccesary because lock_release() has this assertion inside of it.
 
-	assert(q_preallocate(cv->queue, cv->count+1)==0); // realloc the queue to bigger size;
 	assert(q_addtail(cv->queue, curthread)==0); // enqueue the curthread.
-
-	cv->count++;
+    
+    cv->count++;
+    
+    assert(q_preallocate(cv->queue, cv->count+1)==0); // realloc the queue to bigger size;
+	
 	
 	lock_release(lock); // do this because if a thread called cv_wait, it means that a particular condition
 			    // not true.
@@ -286,9 +288,10 @@ cv_signal(struct cv *cv, struct lock *lock)
 	cv->count--;
 	thread_wakeup(front);
 	splx(spl);
-	#endif
+	#else
 	(void)cv;    // suppress warning until code gets written
 	(void)lock;  // suppress warning until code gets written
+	#endif
 }
 
 void
@@ -309,3 +312,5 @@ cv_broadcast(struct cv *cv, struct lock *lock)
 	(void)lock;  // suppress warning until code gets written
 	#endif
 }
+
+

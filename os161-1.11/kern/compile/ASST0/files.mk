@@ -444,6 +444,11 @@ hello.o: ${S}/main/hello.c
 SRCS+=${S}/main/hello.c
 OBJS+=hello.o
 
+foodcourt.o: ${S}/asst1/foodcourt.c
+	${COMPILE.c} ${S}/asst1/foodcourt.c
+SRCS+=${S}/asst1/foodcourt.c
+OBJS+=foodcourt.o
+
 uw-vmstats.o: ${S}/vm/uw-vmstats.c
 	${COMPILE.c} ${S}/vm/uw-vmstats.c
 SRCS+=${S}/vm/uw-vmstats.c

@@ -140,7 +140,8 @@ dumbvm.o: ../../arch/mips/mips/dumbvm.c ../../include/types.h \
 catmouse.o: ../../asst1/catmouse.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/lib.h \
   machine/setjmp.h ../../include/test.h ../../include/thread.h \
-  machine/pcb.h ../../include/synch.h opt-A1.h ../../include/queue.h
+  machine/pcb.h ../../include/synch.h opt-A1.h ../../include/queue.h \
+  opt-A1.h ../../include/asst1/foodcourt.h opt-A1.h
 cache_mips1.o: ../../arch/mips/mips/cache_mips1.S machine/asmdefs.h
 exception.o: ../../arch/mips/mips/exception.S machine/asmdefs.h \
   machine/specialreg.h
@@ -384,6 +385,11 @@ fstest.o: ../../test/fstest.c ../../include/types.h machine/types.h \
 hello.o: ../../main/hello.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/lib.h \
   machine/setjmp.h
+foodcourt.o: ../../asst1/foodcourt.c ../../include/types.h \
+  machine/types.h ../../include/kern/types.h machine/ktypes.h \
+  ../../include/lib.h machine/setjmp.h ../../include/test.h \
+  ../../include/thread.h machine/pcb.h ../../include/synch.h opt-A1.h \
+  ../../include/queue.h opt-A1.h ../../include/asst1/foodcourt.h opt-A1.h
 uw-vmstats.o: ../../vm/uw-vmstats.c opt-A3.h
 autoconf.o: ../../compile/ASST1/autoconf.c ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \

@@ -21,7 +21,10 @@
 #include <test.h>
 #include <thread.h>
 #include <synch.h>
-
+#include "opt-A1.h"
+#if OPT_A1
+#include <asst1/foodcourt.h>
+#endif
 /*
  * 
  * cat,mouse,bowl simulation functions defined in bowls.c
@@ -107,10 +110,13 @@ cat_simulation(void * unusedpointer,
   int i;
   unsigned int bowl;
 
-  /* avoid unused variable warnings. */
+  #if OPT_A1
+  struct foodcourt * foodcourt = (struct foodcourt *)unusedpointer;
+  #else
+  /* Avoid unused variable warnings. */
   (void) unusedpointer;
   (void) catnumber;
-
+  #endif
 
   /* your simulated cat must iterate NumLoops times,
    *  sleeping (by calling cat_sleep() and eating
@@ -132,8 +138,13 @@ cat_simulation(void * unusedpointer,
      * the rules when it eats */
 
     /* legal bowl numbers range from 1 to NumBowls */
+    #if OPT_A1
+    bowl = catnumber % NumBowls + 1;
+    foodcourt_dine(foodcourt, bowl, 'c'); // a cat with number N eats food from N'th bowl.
+    #else
     bowl = ((unsigned int)random() % NumBowls) + 1;
     cat_eat(bowl);
+    #endif
 
   }
 
@@ -168,9 +179,13 @@ mouse_simulation(void * unusedpointer,
   int i;
   unsigned int bowl;
 
+  #if OPT_A1
+  struct foodcourt * foodcourt = (struct foodcourt *)unusedpointer;
+  #else
   /* Avoid unused variable warnings. */
   (void) unusedpointer;
   (void) mousenumber;
+  #endif
 
 
   /* your simulated mouse must iterate NumLoops times,
@@ -193,9 +208,13 @@ mouse_simulation(void * unusedpointer,
      * the rules when it eats */
 
     /* legal bowl numbers range from 1 to NumBowls */
+    #if OPT_A1
+    bowl = mousenumber % NumBowls + 1;
+    foodcourt_dine(foodcourt, bowl, 'm');
+    #else
     bowl = ((unsigned int)random() % NumBowls) + 1;
     mouse_eat(bowl);
-
+    #endif
   }
 
   /* indicate that this mouse is finished */
@@ -280,11 +299,20 @@ catmouse(int nargs,
     panic("catmouse: error initializing bowls.\n");
   }
 
+  #if OPT_A1
+  struct foodcourt *foodcourt;
+  foodcourt = foodcourt_create(NumBowls);
+  #endif
+
   /*
    * Start NumCats cat_simulation() threads.
    */
   for (index = 0; index < NumCats; index++) {
+    #if OPT_A1
+    error = thread_fork("cat_simulation thread",foodcourt,index,cat_simulation,NULL);
+    #else
     error = thread_fork("cat_simulation thread",NULL,index,cat_simulation,NULL);
+    #endif
     if (error) {
       panic("cat_simulation: thread_fork failed: %s\n", strerror(error));
     }
@@ -294,7 +322,11 @@ catmouse(int nargs,
    * Start NumMice mouse_simulation() threads.
    */
   for (index = 0; index < NumMice; index++) {
+    #if OPT_A1
+    error = thread_fork("mouse_simulation thread",foodcourt,index,mouse_simulation,NULL);
+    #else
     error = thread_fork("mouse_simulation thread",NULL,index,mouse_simulation,NULL);
+    #endif
     if (error) {
       panic("mouse_simulation: thread_fork failed: %s\n",strerror(error));
     }
@@ -305,6 +337,10 @@ catmouse(int nargs,
   for(i=0;i<(NumCats+NumMice);i++) {
     P(CatMouseWait);
   }
+
+  #if OPT_A1
+  foodcourt_destroy(foodcourt);
+  #endif
 
   /* clean up the semaphore that we created */
   sem_destroy(CatMouseWait);
