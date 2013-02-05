@@ -64,7 +64,7 @@ void foodcourt_enter(struct foodcourt *f, char ckind) {
         if (c->kind == ckind) {
             c->count++;
         } else {
-            struct creature *creature = kmalloc(sizeof(struct creature));
+            struct creature *creature = creature_create();
             creature->kind = ckind;
             creature->count = 1;
             assert(q_addtail(f->waiting_creatures, creature)==0); // enqueue new comer
@@ -77,7 +77,7 @@ void foodcourt_enter(struct foodcourt *f, char ckind) {
         if (f->currentEater == '-') {}
         else if (f->currentEater != ckind) {
             // put newcomer into foodcourt line.
-            struct creature *creature = kmalloc(sizeof(struct creature));
+            struct creature *creature = creature_create();
             creature->kind = ckind;
             creature->count = 1;
             assert(q_addtail(f->waiting_creatures, creature)==0);
@@ -86,44 +86,19 @@ void foodcourt_enter(struct foodcourt *f, char ckind) {
             cv_wait(f->foodcourt_accessible, f->foodcourt_lock);
         } else {}
     }
-    
-    
 
     lock_release(f->foodcourt_lock);
-}
-
-void foodcourt_dine(struct foodcourt *f, int bowl, char ckind) { // bowl starting from 1
-    foodcourt_enter(f, ckind);
-    // inspect No.bowl bowl vacant or not. If not, cv_wait for cv_signal;
-    // no creature will starve because my cv enforce FIFO
-    lock_acquire(f->bowlLocks[bowl-1]);
-    f->currentEater = ckind;
-    f->numEaters++;
-    //if (f->bowlOccupiers[bowl-1] != '-') cv_wait(f->bowlVacants[bowl-1], f->bowlLocks[bowl-1]);
-    //assert(f->bowlOccupiers[bowl-1] == '-');
-    if (ckind == 'c') {
-        //f->bowlOccupiers[bowl-1] = 'c';
-        cat_eat(bowl);
-    } else {
-        //f->bowlOccupiers[bowl-1] = 'm';
-        mouse_eat(bowl);
-    }
-    lock_release(f->bowlLocks[bowl-1]);
-    
-    foodcourt_exit(f, bowl);
 }
 
 void foodcourt_exit(struct foodcourt *f, int bowl) {
     lock_acquire(f->foodcourt_lock);
     
     f->numEaters--;
-    
     // signal for next eater waiting in bowl cv to eat.
     //lock_acquire(f->bowlLocks[bowl-1]);
     //f->bowlOccupiers[bowl-1] = '-';
     //cv_signal(f->bowlVacants[bowl-1], f->bowlLocks[bowl-1]);
     //lock_release(f->bowlLocks[bowl-1]);
-    
     if (f->numEaters == 0) {
         if (q_empty(f->waiting_creatures)) {
             f->currentEater = '-';
@@ -134,7 +109,7 @@ void foodcourt_exit(struct foodcourt *f, int bowl) {
             for (i = 0; i < c->count; ++i) {
                 cv_signal(f->foodcourt_accessible, f->foodcourt_lock);
             }
-            kfree(c);
+            creature_destroy(c);
         }
     }
     
@@ -151,11 +126,6 @@ void foodcourt_destroy(struct foodcourt *f) {
 //    for (i = 0; i < NumBowls; ++i) {
 //        assert(f->bowlOccupiers[i] == '-');
 //    }
-//    while(!q_empty(f->waiting_creatures)) {
-//        kfree(q_remhead(f->waiting_creatures));
-//    }
-    
-    //assert(q_empty(f->waiting_creatures));
     q_destroy(f->waiting_creatures);
     for (i = 0; i < NumBowls; ++i) {
         lock_destroy(f->bowlLocks[i]);
@@ -167,6 +137,14 @@ void foodcourt_destroy(struct foodcourt *f) {
     kfree(f->bowlLocks);
     //kfree(f->bowlVacants);
     kfree(f);
+}
+
+struct creature *creature_create() {
+    return (struct creature*)kmalloc(sizeof(struct creature));
+}
+
+void creature_destroy(struct creature* c) {
+    kfree(c);
 }
 
 #endif

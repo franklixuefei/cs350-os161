@@ -41,14 +41,16 @@ struct foodcourt {
 
 struct foodcourt *foodcourt_create(int);
 void              foodcourt_enter(struct foodcourt *, char);
-void		      foodcourt_dine(struct foodcourt *, int, char);
 void              foodcourt_exit(struct foodcourt *, int);
 void              foodcourt_destroy(struct foodcourt *);
 
 struct creature {
     volatile char kind;
-    int count;
+    volatile int count;
 };
+
+struct creature *creature_create();
+void   creature_destroy(struct creature*);
 
 #endif /* OPT_A1 */
 

@@ -139,8 +139,19 @@ cat_simulation(void * unusedpointer,
 
     /* legal bowl numbers range from 1 to NumBowls */
     #if OPT_A1
+    foodcourt_enter(foodcourt, 'c');
     bowl = catnumber % NumBowls + 1;
-    foodcourt_dine(foodcourt, bowl, 'c'); // a cat with number N eats food from N'th bowl.
+    // inspect No.bowl bowl vacant or not. If not, cv_wait for cv_signal;
+    // no creature will starve because my cv enforce FIFO
+    lock_acquire(foodcourt->bowlLocks[bowl-1]);
+    foodcourt->currentEater = 'c';
+    foodcourt->numEaters++;
+    //if (foodcourt->bowlOccupiers[bowl-1] != '-') cv_wait(foodcourt->bowlVacants[bowl-1], foodcourt->bowlLocks[bowl-1]);
+    //assert(foodcourt->bowlOccupiers[bowl-1] == '-');
+    //foodcourt->bowlOccupiers[bowl-1] = 'm';
+    cat_eat(bowl);
+    lock_release(foodcourt->bowlLocks[bowl-1]);
+    foodcourt_exit(foodcourt, bowl);
     #else
     bowl = ((unsigned int)random() % NumBowls) + 1;
     cat_eat(bowl);
@@ -209,8 +220,19 @@ mouse_simulation(void * unusedpointer,
 
     /* legal bowl numbers range from 1 to NumBowls */
     #if OPT_A1
+    foodcourt_enter(foodcourt, 'm');
     bowl = mousenumber % NumBowls + 1;
-    foodcourt_dine(foodcourt, bowl, 'm');
+    // inspect No.bowl bowl vacant or not. If not, cv_wait for cv_signal;
+    // no creature will starve because my cv enforce FIFO
+    lock_acquire(foodcourt->bowlLocks[bowl-1]);
+    foodcourt->currentEater = 'm';
+    foodcourt->numEaters++;
+    //if (foodcourt->bowlOccupiers[bowl-1] != '-') cv_wait(foodcourt->bowlVacants[bowl-1], foodcourt->bowlLocks[bowl-1]);
+    //assert(foodcourt->bowlOccupiers[bowl-1] == '-');
+    //foodcourt->bowlOccupiers[bowl-1] = 'm';
+    mouse_eat(bowl);
+    lock_release(foodcourt->bowlLocks[bowl-1]);
+    foodcourt_exit(foodcourt, bowl);
     #else
     bowl = ((unsigned int)random() % NumBowls) + 1;
     mouse_eat(bowl);
