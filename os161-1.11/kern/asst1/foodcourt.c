@@ -8,13 +8,9 @@
 #include <asst1/foodcourt.h>
 #endif
 
-int NumBowls;  // number of food bowls
-
 #if OPT_A1
 struct foodcourt *foodcourt_create(int numBowls) {
 	struct foodcourt * foodcourt;
-    
-    NumBowls = numBowls;
     
 	foodcourt = kmalloc(sizeof(struct foodcourt));
 	if (foodcourt == NULL) return NULL;
@@ -23,15 +19,15 @@ struct foodcourt *foodcourt_create(int numBowls) {
     
     foodcourt->waiting_creatures = q_create(1);
     
-    foodcourt->bowlLocks = kmalloc(NumBowls * sizeof(struct lock *));
+    foodcourt->bowlLocks = kmalloc(numBowls * sizeof(struct lock *));
     if (foodcourt->bowlLocks == NULL) return NULL;
     
-    //foodcourt->bowlVacants = kmalloc(NumBowls * sizeof(struct cv *));
+    //foodcourt->bowlVacants = kmalloc(numBowls * sizeof(struct cv *));
     //if (foodcourt->bowlVacants == NULL) return NULL;
-    //foodcourt->bowlOccupiers = kmalloc(NumBowls * sizeof(char));
+    //foodcourt->bowlOccupiers = kmalloc(numBowls * sizeof(char));
     //if (foodcourt->bowlOccupiers == NULL) return NULL;
     int i;
-    for (i = 0; i < NumBowls; ++i) {
+    for (i = 0; i < numBowls; ++i) {
         foodcourt->bowlLocks[i] = lock_create("bowl_lock");
         if (foodcourt->bowlLocks[i] == NULL) return NULL;
         //foodcourt->bowlVacants[i] = cv_create("bowl_cv");
@@ -54,7 +50,7 @@ struct foodcourt *foodcourt_create(int numBowls) {
 	return foodcourt;
 }
 
-void foodcourt_enter(struct foodcourt *f, char ckind) {
+void foodcourt_start(struct foodcourt *f, char ckind) {
     lock_acquire(f->foodcourt_lock);
     
     if (!q_empty(f->waiting_creatures)) {
@@ -90,7 +86,7 @@ void foodcourt_enter(struct foodcourt *f, char ckind) {
     lock_release(f->foodcourt_lock);
 }
 
-void foodcourt_exit(struct foodcourt *f, int bowl) {
+void foodcourt_end(struct foodcourt *f, int bowl) {
     lock_acquire(f->foodcourt_lock);
     
     f->numEaters--;
@@ -116,7 +112,7 @@ void foodcourt_exit(struct foodcourt *f, int bowl) {
     lock_release(f->foodcourt_lock);
 }
 
-void foodcourt_destroy(struct foodcourt *f) {
+void foodcourt_destroy(struct foodcourt *f, int numBowls) {
     assert(q_empty(f->waiting_creatures));
     assert(f->queue_count==0);
     assert(f->currentEater=='-');
@@ -127,7 +123,7 @@ void foodcourt_destroy(struct foodcourt *f) {
 //        assert(f->bowlOccupiers[i] == '-');
 //    }
     q_destroy(f->waiting_creatures);
-    for (i = 0; i < NumBowls; ++i) {
+    for (i = 0; i < numBowls; ++i) {
         lock_destroy(f->bowlLocks[i]);
         //cv_destroy(f->bowlVacants[i]);
     }

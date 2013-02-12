@@ -11,20 +11,6 @@
 #endif
 
 #if OPT_A1
-/*
- * Dining room encapsulation.
- * Operations:
- *     foodcourt_create:
- *
- *     foodcourt_set_newcomer: 
- *     
- *     
- *
- *
- */
-
-// we dont need queue because if there are cats eating, mice will be cv'ed and they will auto
-//matically enter the queue built in cv.
 
 struct foodcourt {
     volatile struct queue *waiting_creatures; // order corresponding to the order of queue in cv.
@@ -40,9 +26,9 @@ struct foodcourt {
 };
 
 struct foodcourt *foodcourt_create(int);
-void              foodcourt_enter(struct foodcourt *, char);
-void              foodcourt_exit(struct foodcourt *, int);
-void              foodcourt_destroy(struct foodcourt *);
+void              foodcourt_start(struct foodcourt *, char);
+void              foodcourt_end(struct foodcourt *, int);
+void              foodcourt_destroy(struct foodcourt *, int);
 
 struct creature {
     volatile char kind;

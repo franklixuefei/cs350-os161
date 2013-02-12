@@ -139,7 +139,7 @@ cat_simulation(void * unusedpointer,
 
     /* legal bowl numbers range from 1 to NumBowls */
     #if OPT_A1
-    foodcourt_enter(foodcourt, 'c');
+    foodcourt_start(foodcourt, 'c');
     bowl = catnumber % NumBowls + 1;
     // inspect No.bowl bowl vacant or not. If not, cv_wait for cv_signal;
     // no creature will starve because my cv enforce FIFO
@@ -151,7 +151,7 @@ cat_simulation(void * unusedpointer,
     //foodcourt->bowlOccupiers[bowl-1] = 'm';
     cat_eat(bowl);
     lock_release(foodcourt->bowlLocks[bowl-1]);
-    foodcourt_exit(foodcourt, bowl);
+    foodcourt_end(foodcourt, bowl);
     #else
     bowl = ((unsigned int)random() % NumBowls) + 1;
     cat_eat(bowl);
@@ -220,7 +220,7 @@ mouse_simulation(void * unusedpointer,
 
     /* legal bowl numbers range from 1 to NumBowls */
     #if OPT_A1
-    foodcourt_enter(foodcourt, 'm');
+    foodcourt_start(foodcourt, 'm');
     bowl = mousenumber % NumBowls + 1;
     // inspect No.bowl bowl vacant or not. If not, cv_wait for cv_signal;
     // no creature will starve because my cv enforce FIFO
@@ -232,7 +232,7 @@ mouse_simulation(void * unusedpointer,
     //foodcourt->bowlOccupiers[bowl-1] = 'm';
     mouse_eat(bowl);
     lock_release(foodcourt->bowlLocks[bowl-1]);
-    foodcourt_exit(foodcourt, bowl);
+    foodcourt_end(foodcourt, bowl);
     #else
     bowl = ((unsigned int)random() % NumBowls) + 1;
     mouse_eat(bowl);
@@ -361,7 +361,7 @@ catmouse(int nargs,
   }
 
   #if OPT_A1
-  foodcourt_destroy(foodcourt);
+  foodcourt_destroy(foodcourt, NumBowls);
   #endif
 
   /* clean up the semaphore that we created */

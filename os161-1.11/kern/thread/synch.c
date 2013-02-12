@@ -138,6 +138,7 @@ lock_destroy(struct lock *lock)
 	
 	//spl = splhigh();
 	assert(!lock->held);
+    assert(!lock_do_i_hold(lock));
 	assert(lock->origThread == NULL);
 	//assert(thread_hassleepers(lock) == 0);
 	//splx(spl);
