@@ -237,7 +237,7 @@ cv_destroy(struct cv *cv)
 	// add stuff here as needed
 	#if OPT_A1
 	assert(cv->count==0);
-	q_destroy(cv->queue);
+	q_destroy((struct queue*)cv->queue);
 	#endif
 	kfree(cv->name);
 	kfree(cv);
@@ -256,11 +256,11 @@ cv_wait(struct cv *cv, struct lock *lock)
 	assert(cv!=NULL && lock!=NULL);
 	assert(lock_do_i_hold(lock)); // not neccesary because lock_release() has this assertion inside of it.
 
-	assert(q_addtail(cv->queue, curthread)==0); // enqueue the curthread.
+	assert(q_addtail(cv->queue, (void *)curthread)==0); // enqueue the curthread.
     
     cv->count++;
     
-    assert(q_preallocate(cv->queue, cv->count+1)==0); // realloc the queue to bigger size;
+    assert(q_preallocate(cv->queue, (int)(cv->count+1))==0); // realloc the queue to bigger size;
 	
 	
 	lock_release(lock); // do this because if a thread called cv_wait, it means that a particular condition
