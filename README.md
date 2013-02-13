@@ -1,2 +1,2 @@
-cs350 group
+cs350 Group
 ===========
