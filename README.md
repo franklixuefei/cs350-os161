@@ -1,2 +1,2 @@
-cs350 Group
+cs350 Group test gitignore
 ===========
