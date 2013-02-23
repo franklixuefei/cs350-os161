@@ -7,6 +7,7 @@
 #include "opt-A2.h"
 /* Get machine-dependent stuff */
 #include <machine/pcb.h>
+#include "pidStore.h"
 
 
 struct addrspace;
