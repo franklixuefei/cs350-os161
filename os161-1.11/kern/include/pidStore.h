@@ -1,3 +1,6 @@
+#ifndef _PIDSTORE_H_
+#define _PIDSTORE_H_
+
 /*
  * =====================================================================================
  *
@@ -44,4 +47,5 @@ safeReturnPID(pid_t usedPID);
 
 
 
+#endif
 #endif
