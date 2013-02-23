@@ -12,6 +12,7 @@
 #include <scheduler.h>
 #include <addrspace.h>
 #include <vnode.h>
+#include "pidStore.h"
 #include "opt-synchprobs.h"
 
 /* States a thread can be in. */
@@ -61,6 +62,13 @@ thread_create(const char *name)
 	
 	// If you add things to the thread structure, be sure to initialize
 	// them here.
+#if OPT_A2
+    thread->pid = safeGetPID();
+    
+    thread->childrenProcesses = q_create(MAX_CHILD_PROCESSES_COUNT);
+    thread->childrenProcessesLock = lock_create("children processes lock");
+    thread->files = array_create();
+#endif
 	
 	return thread;
 }

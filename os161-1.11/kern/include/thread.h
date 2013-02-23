@@ -37,6 +37,12 @@ struct thread {
 	 * and is manipulated by the virtual filesystem (VFS) code.
 	 */
 	struct vnode *t_cwd;
+#if OPT_A2
+    pid_t pid;
+    struct array* files;
+    struct queue* childrenProcesses;
+    struct lock* childrenProcessesLock;
+#endif
 };
 
 /* Call once during startup to allocate data structures. */
