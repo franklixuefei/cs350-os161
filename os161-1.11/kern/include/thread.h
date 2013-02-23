@@ -4,7 +4,7 @@
 /*
  * Definition of a thread.
  */
-
+#include "opt-A2.h"
 /* Get machine-dependent stuff */
 #include <machine/pcb.h>
 
