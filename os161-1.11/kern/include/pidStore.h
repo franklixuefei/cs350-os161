@@ -21,6 +21,7 @@
 #if OPT_A2
 
 #include "queue.h"
+#include <machine/pcb.h>
 #include <synch.h>
 
 #define MAX_CHILD_PROCESSES_COUNT 10
