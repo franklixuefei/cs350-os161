@@ -13,7 +13,7 @@
 #include <scheduler.h>
 #include <addrspace.h>
 #include <vnode.h>
-
+#include "pidStore.h"
 #include "opt-synchprobs.h"
 
 /* States a thread can be in. */
