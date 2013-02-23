@@ -1,6 +1,7 @@
 /*
  * Core thread system.
  */
+#include "opt-A2.h"
 #include <types.h>
 #include <lib.h>
 #include <kern/errno.h>
