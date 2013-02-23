@@ -34,7 +34,7 @@ struct pidStore{
     
     pid_t currentPID;
     struct lock* currentPIDLock;
-}
+};
 
 pid_t
 safeGetPID ();

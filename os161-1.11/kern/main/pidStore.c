@@ -21,7 +21,7 @@
 #if OPT_A2
 
 #include <stdlib.h>
-
+#include <types.h>
 #define MAX_AMOUNT_PID 100
 
 struct pidStore *myStore = NULL;
