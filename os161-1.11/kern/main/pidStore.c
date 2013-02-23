@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <types.h>
+#include <pidStore.h>
 #define MAX_AMOUNT_PID 100
 
 struct pidStore *myStore = NULL;
