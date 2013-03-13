@@ -160,11 +160,11 @@ syscall.o: ../../arch/mips/mips/syscall.c ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/kern/errno.h ../../include/lib.h machine/setjmp.h \
   machine/pcb.h machine/spl.h machine/trapframe.h \
-  ../../include/kern/callno.h ../../include/process.h opt-A2.h \
-  ../../include/synch.h opt-A1.h ../../include/queue.h \
-  ../../include/thread.h ../../include/array.h ../../include/syscall.h \
-  ../../include/curthread.h opt-A2.h ../../include/addrspace.h \
-  ../../include/vm.h machine/vm.h opt-dumbvm.h
+  ../../include/kern/unistd.h ../../include/kern/callno.h \
+  ../../include/process.h opt-A2.h ../../include/synch.h opt-A1.h \
+  ../../include/queue.h ../../include/thread.h ../../include/array.h \
+  ../../include/syscall.h ../../include/curthread.h opt-A2.h \
+  ../../include/addrspace.h ../../include/vm.h machine/vm.h opt-dumbvm.h
 threadstart.o: ../../arch/mips/mips/threadstart.S machine/asmdefs.h
 trap.o: ../../arch/mips/mips/trap.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/lib.h \
@@ -438,10 +438,11 @@ fork.o: ../../userprog/fork.c opt-A2.h ../../include/kern/errno.h \
   ../../include/types.h machine/types.h ../../include/kern/types.h \
   machine/ktypes.h ../../include/thread.h opt-A2.h machine/pcb.h \
   machine/setjmp.h machine/spl.h ../../include/lib.h \
-  ../../include/addrspace.h ../../include/vm.h machine/vm.h opt-dumbvm.h \
-  ../../include/syscall.h machine/trapframe.h ../../include/test.h \
-  ../../include/synch.h opt-A1.h ../../include/queue.h \
-  ../../include/process.h ../../include/array.h ../../include/curthread.h
+  ../../include/vnode.h ../../include/vfs.h ../../include/addrspace.h \
+  ../../include/vm.h machine/vm.h opt-dumbvm.h ../../include/syscall.h \
+  machine/trapframe.h ../../include/test.h ../../include/synch.h opt-A1.h \
+  ../../include/queue.h ../../include/process.h ../../include/array.h \
+  ../../include/curthread.h ../../include/files.h
 execv.o: ../../userprog/execv.c
 uw-vmstats.o: ../../vm/uw-vmstats.c opt-A3.h
 autoconf.o: ../../compile/ASST2/autoconf.c ../../include/types.h \

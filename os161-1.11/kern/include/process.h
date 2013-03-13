@@ -8,13 +8,14 @@
 #include <thread.h>
 #include <array.h>
 
-#define MAX_FORKED_PROCESSES 50
+#define MAX_FORKED_PROCESSES 70
 
 struct process {
     int exitcode;
     pid_t pid;
-    int active;
+    int active; // init to 0
     struct array *children;
+    int parentWaiting; // init to 0
 };
 
 extern struct process process_table[MAX_FORKED_PROCESSES];

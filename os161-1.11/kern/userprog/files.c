@@ -16,7 +16,7 @@ struct files * files_create(const char* filename, struct vnode *vn, int flags) {
     if (file == NULL) {
         return NULL;
     }
-    file->filename = filename;
+    file->filename = (char*)filename;
     file->vn = vn;
     file->flags = flags;
     file->offset = 0;

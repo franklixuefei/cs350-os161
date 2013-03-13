@@ -10,6 +10,8 @@
 #include <machine/pcb.h>
 #include <machine/spl.h>
 #include <lib.h>
+#include <vnode.h>
+#include <vfs.h>
 #include <addrspace.h>
 #include <syscall.h>
 #include <test.h>
@@ -18,6 +20,7 @@
 #include <process.h>
 #include <array.h>
 #include <curthread.h>
+#include <files.h>
 #include <machine/trapframe.h>
 
 int
@@ -25,16 +28,14 @@ sys_fork(struct trapframe* tf, pid_t *retval)
 {
     struct thread *child = NULL;
     
-    struct addrspace *t_vmspace = NULL;
+    //struct addrspace *t_vmspace = NULL;
     
     struct trapframe *t_tf = NULL;
     
-    int spl, i;
-    spl = splhigh();
+    int i;
     for(i = 0; i < MAX_FORKED_PROCESSES; ++i) {
         if (process_table[i].active == 0) break; // indicating not full.
     }
-    splx(spl);
     
     if (i >= MAX_FORKED_PROCESSES) {
         *retval = EAGAIN;
@@ -48,32 +49,33 @@ sys_fork(struct trapframe* tf, pid_t *retval)
         return -1;
     }
     int res;
-    res = as_copy(curthread->t_vmspace, &t_vmspace);
-    if (res) {
-        return res;
-    }
+//    res = as_copy(curthread->t_vmspace, &t_vmspace);
+//    if (res) {
+//        return res;
+//    }
     
     memcpy(t_tf, tf, sizeof(struct trapframe));
     
-    
-    res = thread_fork("child", t_tf, (unsigned long)t_vmspace, md_forkentry, &child);
+    curthread->forkcalled = 1;
+    res = thread_fork("child", t_tf, 0, md_forkentry, &child);
     if (res) { // fails
         return res;
     } else {
         *retval = child->pid;
     }
     
-    for(i=0;i<MAX_OPENED_FILES;i++){
-        if(child->files[i]!=NULL){
-            child->files[i]=curthread->files[i];
-        }else{
-            break;
+//    // copy filetable
+        if (process_table[(int)(curthread->pid)].children == NULL) {
+        process_table[(int)(curthread->pid)].children = array_create();
+        if (process_table[(int)(curthread->pid)].children == NULL) {
+            *retval = ENOMEM;
+            return -1;
         }
     }
-    
-    //add children
-    //result=array_add(curthread->children,&newguy);
-    // if(result) return result;
+    res = array_add(process_table[(int)(curthread->pid)].children,(int *)child->pid);
+    if(res) {
+        return res;
+    }
     
     
     return 0;

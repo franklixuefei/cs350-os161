@@ -43,6 +43,7 @@ struct thread {
     pid_t pid;
     //int exitcode;
     struct files* files[MAX_OPENED_FILES];
+    int forkcalled;
     //struct queue* childrenProcesses;
     //struct lock* childrenProcessesLock;
 #endif

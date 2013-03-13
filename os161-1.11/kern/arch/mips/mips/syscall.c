@@ -4,6 +4,7 @@
 #include <machine/pcb.h>
 #include <machine/spl.h>
 #include <machine/trapframe.h>
+#include <kern/unistd.h>
 #include <kern/callno.h>
 #include <process.h>
 #include <syscall.h>
@@ -142,7 +143,7 @@ mips_syscall(struct trapframe *tf)
 		tf->tf_v0 = retval;
 		tf->tf_a3 = 0;      /* signal no error */
 	}
-	
+    
 	/*
 	 * Now, advance the program counter, to avoid restarting
 	 * the syscall over and over again.
@@ -155,7 +156,7 @@ mips_syscall(struct trapframe *tf)
 }
 
 void
-md_forkentry(struct trapframe *tf, unsigned long usermode_addrspace)
+md_forkentry(struct trapframe *tf, unsigned long unused)
 {
     #if OPT_A2
     struct trapframe own_stack_tf; // important to make tf locally otherwise assertion failure
@@ -164,15 +165,15 @@ md_forkentry(struct trapframe *tf, unsigned long usermode_addrspace)
     own_stack_tf.tf_v0 = 0; // return 0 on child thread, indicating no problem.
     own_stack_tf.tf_a3 = 0; // same as above
     own_stack_tf.tf_epc += 4; // go to next instr after <fork> in user space !!important
-    //curthread->pid = my_tf.tf_a0; // assign pid NOW!!
     int res;
-    res = as_copy((struct addrspace *)usermode_addrspace, &(curthread->t_vmspace));
-    if (res) {
-        return ;
-    }
-    as_activate(curthread->t_vmspace);
+//    res = as_copy((struct addrspace *)usermode_addrspace, &(curthread->t_vmspace));
+//    if (res) {
+//        kprintf("as_copy failed in md_forkentry\n");
+//        return;
+//    }
+//    as_activate(curthread->t_vmspace);
 
-    kfree((struct addrspace *)usermode_addrspace);
+    //kfree((struct addrspace *)usermode_addrspace);
     mips_usermode(&own_stack_tf);
     #else
 	/*
