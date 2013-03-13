@@ -26,10 +26,8 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
         *retval = EBADF;
         return -1;
     }
-
+/* 
     int res;
-    char* console;
-    /* stdin */
     console = kstrdup("console-stdin:");
     curthread->files[0] = kmalloc(sizeof(struct files));
     if (curthread->files[0] == NULL) {
@@ -43,7 +41,6 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
         *retval = res;
         return -1;
     }
-    /* stdout */
     console = kstrdup("console-stdout:");
     curthread->files[1] = kmalloc(sizeof(struct files));
     if (curthread->files[1] == NULL) {
@@ -57,7 +54,6 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
         *retval = res;
         return -1;
     }
-    /* stderr */
     console = kstrdup("console-stderr:");
     curthread->files[2] = kmalloc(sizeof(struct files));
     if (curthread->files[2] == NULL) {
@@ -72,6 +68,7 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
         return -1;
     }
     kfree(console);
+ * */
 
     struct uio copyUIO;
     int result;
