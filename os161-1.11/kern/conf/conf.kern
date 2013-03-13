@@ -458,6 +458,16 @@ file      main/hello.c
 defoption A1
 file	  asst1/foodcourt.c
 defoption A2
+file	  userprog/getpid.c
+file	  userprog/waitpid.c
+file	  userprog/_exit.c
+file	  userprog/files.c
+file	  userprog/open.c
+file	  userprog/close.c
+file	  userprog/read.c
+file	  userprog/write.c
+file	  userprog/fork.c
+file	  userprog/execv.c    
 # UW For A3 use the stats tracking code provided
 defoption A3
    file    vm/uw-vmstats.c

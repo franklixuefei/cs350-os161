@@ -1,24 +1,3 @@
-#ifndef _PIDSTORE_H_
-#define _PIDSTORE_H_
-
-/*
- * =====================================================================================
- *
- *       Filename:  pidStore.h
- *
- *    Description:  manage PIDs for processes
- *
- *        Version:  1.0
- *        Created:  02/17/2013 12:24:19 AM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Yongxin
- *   Organization:
- *
- * =====================================================================================
- */
-
 #include "opt-A2.h"
 
 #if OPT_A2

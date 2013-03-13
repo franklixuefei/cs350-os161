@@ -9,12 +9,16 @@
 #include <machine/spl.h>
 #include <machine/pcb.h>
 #include <thread.h>
+#include <synch.h>
 #include <curthread.h>
 #include <scheduler.h>
 #include <addrspace.h>
 #include <vnode.h>
-#include "pidStore.h"
+#include <process.h>
 #include "opt-synchprobs.h"
+#include "files.h"
+#include <kern/unistd.h>
+#include <vfs.h>
 
 /* States a thread can be in. */
 typedef enum {
@@ -35,6 +39,10 @@ static struct array *zombies;
 
 /* Total number of outstanding threads. Does not count zombies[]. */
 static int numthreads;
+
+#if OPT_A2
+struct process process_table[MAX_FORKED_PROCESSES];
+#endif
 
 /*
  * Create a thread. This is used both to create the first thread's 
@@ -58,19 +66,67 @@ thread_create(const char *name)
 	thread->t_stack = NULL;
 	
 	thread->t_vmspace = NULL;
-
+    
 	thread->t_cwd = NULL;
 	
 	// If you add things to the thread structure, be sure to initialize
 	// them here.
 #if OPT_A2
-    thread->pid = safeGetPID();
+    int i;
     
-    thread->childrenProcesses = q_create(MAX_CHILD_PROCESSES_COUNT);
-    thread->childrenProcessesLock = lock_create("children processes lock");
-    thread->files = array_create();
+    for (i = 1; i < MAX_FORKED_PROCESSES; i++) {// pid cannot be 0
+        if (!process_table[i].active) {
+            thread->pid = i; 
+            process_table[i].pid = i; // may not used
+            process_table[i].active = 1;
+            break;
+        }
+    }
+    
+    for (i = 0; i < MAX_OPENED_FILES; i++) { // init new file table
+        thread->files[i] = NULL;
+    }
+//    
+//    /* stdin */    
+//    char *console = kstrdup("console-stdin:");
+//    thread->files[0] = kmalloc(sizeof(struct files));
+//    if (thread->files[0] == NULL) {
+//        return NULL;
+//    }
+//    thread->files[0]->offset = 0;
+//    thread->files[0]->vn = NULL;
+//    res = vfs_open(console, O_RDONLY, &thread->files[0]->vn);
+//    if (res) {
+//        return NULL;
+//    }
+//    /* stdout */
+//    console = kstrdup("console-stdout:");
+//    thread->files[1] = kmalloc(sizeof(struct files));
+//    if (thread->files[1] == NULL) {
+//        return NULL;
+//    }
+//    thread->files[1]->offset = 0;
+//    thread->files[1]->vn = NULL;
+//    res = vfs_open(console, O_WRONLY, &thread->files[1]->vn);
+//    if (res) {
+//        return NULL;
+//    }
+//    /* stderr */
+//    console = kstrdup("console-stderr:");
+//    thread->files[2] = kmalloc(sizeof(struct files));
+//    if (thread->files[2] == NULL) {
+//        return NULL;
+//    }
+//    thread->files[2]->offset = 0;
+//    thread->files[2]->vn = NULL;
+//    res = vfs_open(console, O_WRONLY, &thread->files[2]->vn);
+//    if (res) {
+//        return NULL;
+//    }
+//    kfree(console);
+    
+    
 #endif
-	
 	return thread;
 }
 
@@ -216,6 +272,7 @@ thread_bootstrap(void)
 {
 	struct thread *me;
 
+
 	/* Create the data structures we need. */
 	sleepers = array_create();
 	if (sleepers==NULL) {
@@ -231,6 +288,17 @@ thread_bootstrap(void)
 	 * Create the thread structure for the first thread
 	 * (the one that's already running)
 	 */
+#if OPT_A2
+    // FIXME may init more fields here.
+    int i;
+    for (i = 0; i < MAX_FORKED_PROCESSES; i++) { // pid cannot be 0
+        process_table[i].children = array_create();
+    }
+    for (i = 1; i < MAX_FORKED_PROCESSES; i++) { // pid cannot be 0
+        process_table[i].active = 0;
+        process_table[i].children = array_create();
+    }
+#endif
 	me = thread_create("<boot/menu>");
 	if (me==NULL) {
 		panic("thread_bootstrap: Out of memory\n");
@@ -260,6 +328,14 @@ thread_bootstrap(void)
 void
 thread_shutdown(void)
 {
+    //FIXME may free some other fields first.
+    int i;
+    for (i = 1; i < MAX_FORKED_PROCESSES; i++) { // pid cannot be 0
+        process_table[i].active = 0;
+        // FIXME here maybe destroy all children first
+        array_destroy(process_table[i].children);
+    }
+    //kfree(process_table);
 	array_destroy(sleepers);
 	sleepers = NULL;
 	array_destroy(zombies);
@@ -301,7 +377,7 @@ thread_fork(const char *name,
 	newguy->t_stack[1] = 0x11;
 	newguy->t_stack[2] = 0xda;
 	newguy->t_stack[3] = 0x33;
-
+    
 	/* Inherit the current directory */
 	if (curthread->t_cwd != NULL) {
 		VOP_INCREF(curthread->t_cwd);
@@ -488,7 +564,9 @@ thread_exit(void)
 	}
 
 	splhigh();
-
+    
+    
+    
 	if (curthread->t_vmspace) {
 		/*
 		 * Do this carefully to avoid race condition with

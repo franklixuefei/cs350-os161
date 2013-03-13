@@ -7,8 +7,9 @@
 #include "opt-A2.h"
 /* Get machine-dependent stuff */
 #include <machine/pcb.h>
-#include "pidStore.h"
-
+#if OPT_A2
+#define MAX_OPENED_FILES 20
+#endif
 
 struct addrspace;
 
@@ -40,9 +41,10 @@ struct thread {
 	struct vnode *t_cwd;
 #if OPT_A2
     pid_t pid;
-    struct array* files;
-    struct queue* childrenProcesses;
-    struct lock* childrenProcessesLock;
+    //int exitcode;
+    struct files* files[MAX_OPENED_FILES];
+    //struct queue* childrenProcesses;
+    //struct lock* childrenProcessesLock;
 #endif
 };
 

@@ -29,8 +29,9 @@
  */
 extern const int buildversion;
 extern const char buildconfig[];
+#if OPT_A0
 extern void hello();
-
+#endif
 /*
  * Copyright message for the OS/161 base code.
  */
