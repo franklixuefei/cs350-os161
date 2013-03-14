@@ -18,7 +18,10 @@ sys__exit(int exitcode) {
     process_table[curthread->pid].exitcode = exitcode;
     // FIXME close all open files and free the file table entries
     int i;
-    for (i=0; i<MAX_OPENED_FILES; ++i) {
+
+    vfs_close(curthread->files[0]->vn);
+    files_destroy(curthread->files[0]);
+    for (i=3; i<MAX_OPENED_FILES; ++i) {
         if (curthread->files[i]) {
             vfs_close(curthread->files[i]->vn);
             files_destroy(curthread->files[i]);

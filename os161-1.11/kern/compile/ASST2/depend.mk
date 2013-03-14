@@ -428,17 +428,19 @@ close.o: ../../userprog/close.c opt-A2.h ../../include/types.h \
   ../../include/files.h
 read.o: ../../userprog/read.c opt-A2.h ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
-  ../../include/lib.h machine/setjmp.h ../../include/thread.h opt-A2.h \
-  machine/pcb.h ../../include/curthread.h ../../include/vnode.h \
-  ../../include/uio.h ../../include/syscall.h machine/trapframe.h \
-  ../../include/kern/unistd.h ../../include/kern/errno.h \
-  ../../include/vfs.h ../../include/files.h
+  ../../include/vm.h machine/vm.h ../../include/lib.h machine/setjmp.h \
+  ../../include/thread.h opt-A2.h machine/pcb.h ../../include/curthread.h \
+  ../../include/vnode.h ../../include/uio.h ../../include/syscall.h \
+  machine/trapframe.h ../../include/kern/unistd.h \
+  ../../include/kern/errno.h ../../include/vfs.h ../../include/files.h \
+  ../../include/addrspace.h opt-dumbvm.h
 write.o: ../../userprog/write.c opt-A2.h ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/lib.h machine/setjmp.h ../../include/thread.h opt-A2.h \
   machine/pcb.h ../../include/curthread.h ../../include/vnode.h \
   ../../include/uio.h ../../include/syscall.h machine/trapframe.h \
   ../../include/kern/unistd.h ../../include/vfs.h ../../include/files.h \
+  ../../include/addrspace.h ../../include/vm.h machine/vm.h opt-dumbvm.h \
   ../../include/kern/errno.h
 fork.o: ../../userprog/fork.c opt-A2.h ../../include/kern/errno.h \
   ../../include/types.h machine/types.h ../../include/kern/types.h \
@@ -450,7 +452,16 @@ fork.o: ../../userprog/fork.c opt-A2.h ../../include/kern/errno.h \
   ../../include/queue.h ../../include/process.h ../../include/array.h \
   ../../include/curthread.h ../../include/files.h \
   ../../include/kern/unistd.h
-execv.o: ../../userprog/execv.c
+execv.o: ../../userprog/execv.c opt-A2.h ../../include/kern/errno.h \
+  ../../include/types.h machine/types.h ../../include/kern/types.h \
+  machine/ktypes.h ../../include/thread.h opt-A2.h machine/pcb.h \
+  machine/setjmp.h machine/spl.h ../../include/lib.h \
+  ../../include/vnode.h ../../include/uio.h ../../include/vfs.h \
+  ../../include/addrspace.h ../../include/vm.h machine/vm.h opt-dumbvm.h \
+  ../../include/syscall.h machine/trapframe.h ../../include/test.h \
+  ../../include/synch.h opt-A1.h ../../include/queue.h \
+  ../../include/process.h ../../include/array.h ../../include/curthread.h \
+  ../../include/files.h ../../include/kern/unistd.h
 uw-vmstats.o: ../../vm/uw-vmstats.c opt-A3.h
 autoconf.o: ../../compile/ASST2/autoconf.c ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \

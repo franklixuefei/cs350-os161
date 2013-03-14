@@ -351,31 +351,33 @@ thread_fork(const char *name,
 		newguy->t_cwd = curthread->t_cwd;
 	}
     
-    #if OPT_A2
+#if OPT_A2
     
-    if(curthread->forkcalled == 1) {
-        int i, res;
+    if(curthread->forkcalled) {
+        int i, res, spl;
         //copy address space
         res = as_copy(curthread->t_vmspace,&newguy->t_vmspace);
         if (res) {
-            kprintf("as_copy failed in thread_fork, curthread_vmspace_addr: %p, newguy_vmspace_addr: %p\n", curthread->t_vmspace, newguy->t_vmspace);
+            //kprintf("as_copy failed in thread_fork, curthread_vmspace_addr: %p, newguy_vmspace_addr: %p\n", curthread->t_vmspace, newguy->t_vmspace);
             return res;
         }
-//        as_activate(curthread->t_vmspace);
+        //        as_activate(curthread->t_vmspace);
         //copy vnodes
+//        spl = splhigh();
         for(i=0;i<MAX_OPENED_FILES;i++) {
             if(curthread->files[i]!=NULL) {
                 newguy->files[i]=curthread->files[i];
                 VOP_INCOPEN(newguy->files[i]->vn);
-                //VOP_INCREF(newguy->files[i]->vn);
+                VOP_INCREF(newguy->files[i]->vn);
             } else {
                 break;
             }
         }
+//        splx(spl);
         
         curthread->forkcalled = 0;
     }
-    #endif
+#endif
     
 	/* Set up the pcb (this arranges for func to be called) */
 	md_initpcb(&newguy->t_pcb, newguy->t_stack, data1, data2, func);

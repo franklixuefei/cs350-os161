@@ -20,7 +20,7 @@
 
 #include <unistd.h>
 #include <err.h>
-#include<stdio.h>
+//#include <stdio.h>
 
 static volatile int pid;
 

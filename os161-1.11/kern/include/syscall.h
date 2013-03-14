@@ -21,6 +21,7 @@ int sys_close(int fd, pid_t *retval);
 int sys_fork(struct trapframe *tf, pid_t *retval);
 int sys_read(int fd, void *buf, size_t buflen, pid_t *retval);
 int sys_write(int fd, const void *buf, size_t nbytes, pid_t *retval);
+int sys_execv(const char* program, char **args, pid_t *retval);
 #endif
 
 #endif /* _SYSCALL_H_ */

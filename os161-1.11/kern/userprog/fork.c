@@ -73,13 +73,13 @@ sys_fork(struct trapframe* tf, pid_t *retval)
             return -1;
         }
     }
-    res = array_add(process_table[(int)(curthread->pid)].children,(int *)child->pid);
+    res = array_add(process_table[(int)(curthread->pid)].children,(int *)(*retval));
     if(res) {
         return res;
     }
     //if (process_table[(int)(child->pid)].processSem == NULL) process_table[(int)(child->pid)].processSem = sem_create("process_sem", 0);
     //kprintf("waiting on forkentry");
-    P(process_table[(int)(child->pid)].processSem);
+    P(process_table[(int)(*retval)].processSem);
     
     return 0;
     

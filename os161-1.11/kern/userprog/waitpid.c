@@ -58,9 +58,11 @@ sys_waitpid(pid_t pid, int *status, int options, pid_t *retval)
         //if (child_process.active == 0) {
             //process_table[(int)pid].parentWaiting = 1;
             //if (process_table[(int)(curthread->pid)].processSem == NULL) process_table[(int)(curthread->pid)].processSem = sem_create("process_sem", 0);
-            P(process_table[(int)pid].processSem);
+        P(process_table[(int)pid].processSem);
+            
         //}
         *retval = pid;
+        process_table[(int)pid].parentWaiting = 0;
         return 0;
     }
     

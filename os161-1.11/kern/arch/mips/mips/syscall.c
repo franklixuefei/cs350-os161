@@ -113,18 +113,19 @@ mips_syscall(struct trapframe *tf)
             break;
             
         case SYS_read:
-            err = sys_read((int32_t)tf->tf_a0, (userptr_t)tf->tf_a1,
-                           (size_t)tf->tf_a2, &retval);
+            err = sys_read((int32_t)tf->tf_a0, (userptr_t)tf->tf_a1, (size_t)tf->tf_a2, &retval);
             break;
             
         case SYS_write:
-            err = sys_write((int32_t)tf->tf_a0, (userptr_t)tf->tf_a1,
-                            (size_t)tf->tf_a2, &retval);
+            err = sys_write((int32_t)tf->tf_a0, (userptr_t)tf->tf_a1, (size_t)tf->tf_a2, &retval);
             break;
             
         case SYS_waitpid:
-            err = sys_waitpid((int32_t)tf->tf_a0, (userptr_t)tf->tf_a1,
-                            (size_t)tf->tf_a2, &retval);
+            err = sys_waitpid((int32_t)tf->tf_a0, (int *)tf->tf_a1, (int)tf->tf_a2, &retval);
+            break;
+            
+        case SYS_execv:
+            err = sys_execv((const char *)tf->tf_a0, (char **)tf->tf_a1, &retval);
             break;
         
 #endif
