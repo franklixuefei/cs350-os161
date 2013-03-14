@@ -392,7 +392,13 @@ getpid.o: ../../userprog/getpid.c opt-A2.h ../../include/syscall.h \
   ../../include/kern/types.h machine/ktypes.h machine/trapframe.h \
   ../../include/thread.h machine/pcb.h machine/setjmp.h \
   ../../include/curthread.h
-waitpid.o: ../../userprog/waitpid.c opt-A2.h
+waitpid.o: ../../userprog/waitpid.c opt-A2.h ../../include/syscall.h \
+  opt-A2.h ../../include/types.h machine/types.h \
+  ../../include/kern/types.h machine/ktypes.h machine/trapframe.h \
+  ../../include/process.h ../../include/synch.h opt-A1.h \
+  ../../include/queue.h ../../include/thread.h machine/pcb.h \
+  machine/setjmp.h ../../include/array.h ../../include/curthread.h \
+  ../../include/kern/errno.h machine/spl.h ../../include/kern/unistd.h
 _exit.o: ../../userprog/_exit.c opt-A2.h ../../include/syscall.h opt-A2.h \
   ../../include/types.h machine/types.h ../../include/kern/types.h \
   machine/ktypes.h machine/trapframe.h ../../include/thread.h \
@@ -442,7 +448,8 @@ fork.o: ../../userprog/fork.c opt-A2.h ../../include/kern/errno.h \
   ../../include/vm.h machine/vm.h opt-dumbvm.h ../../include/syscall.h \
   machine/trapframe.h ../../include/test.h ../../include/synch.h opt-A1.h \
   ../../include/queue.h ../../include/process.h ../../include/array.h \
-  ../../include/curthread.h ../../include/files.h
+  ../../include/curthread.h ../../include/files.h \
+  ../../include/kern/unistd.h
 execv.o: ../../userprog/execv.c
 uw-vmstats.o: ../../vm/uw-vmstats.c opt-A3.h
 autoconf.o: ../../compile/ASST2/autoconf.c ../../include/types.h \

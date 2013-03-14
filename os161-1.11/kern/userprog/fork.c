@@ -22,6 +22,7 @@
 #include <curthread.h>
 #include <files.h>
 #include <machine/trapframe.h>
+#include <kern/unistd.h>
 
 int
 sys_fork(struct trapframe* tf, pid_t *retval)
@@ -49,10 +50,10 @@ sys_fork(struct trapframe* tf, pid_t *retval)
         return -1;
     }
     int res;
-//    res = as_copy(curthread->t_vmspace, &t_vmspace);
-//    if (res) {
-//        return res;
-//    }
+    //    res = as_copy(curthread->t_vmspace, &t_vmspace);
+    //    if (res) {
+    //        return res;
+    //    }
     
     memcpy(t_tf, tf, sizeof(struct trapframe));
     
@@ -64,8 +65,8 @@ sys_fork(struct trapframe* tf, pid_t *retval)
         *retval = child->pid;
     }
     
-//    // copy filetable
-        if (process_table[(int)(curthread->pid)].children == NULL) {
+
+    if (process_table[(int)(curthread->pid)].children == NULL) {
         process_table[(int)(curthread->pid)].children = array_create();
         if (process_table[(int)(curthread->pid)].children == NULL) {
             *retval = ENOMEM;
@@ -76,7 +77,9 @@ sys_fork(struct trapframe* tf, pid_t *retval)
     if(res) {
         return res;
     }
-    
+    //if (process_table[(int)(child->pid)].processSem == NULL) process_table[(int)(child->pid)].processSem = sem_create("process_sem", 0);
+    //kprintf("waiting on forkentry");
+    P(process_table[(int)(child->pid)].processSem);
     
     return 0;
     

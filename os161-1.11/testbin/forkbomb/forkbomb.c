@@ -20,6 +20,7 @@
 
 #include <unistd.h>
 #include <err.h>
+#include<stdio.h>
 
 static volatile int pid;
 
@@ -27,8 +28,8 @@ int
 main()
 {
 	int i;
-
-	while (1) {
+    int j=0;
+	while (2) {
 		fork();
 
 		pid = getpid();
@@ -43,5 +44,8 @@ main()
 				     seenpid, getpid());
 			}
 		}
+     //
+        //j++;
 	}
+    //printf("YYYYYYYYYYYYY\n");
 }

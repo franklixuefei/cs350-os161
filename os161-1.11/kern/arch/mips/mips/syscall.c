@@ -8,6 +8,7 @@
 #include <kern/callno.h>
 #include <process.h>
 #include <syscall.h>
+#include <synch.h>
 #include <curthread.h>
 #include "opt-A2.h"
 
@@ -120,6 +121,11 @@ mips_syscall(struct trapframe *tf)
             err = sys_write((int32_t)tf->tf_a0, (userptr_t)tf->tf_a1,
                             (size_t)tf->tf_a2, &retval);
             break;
+            
+        case SYS_waitpid:
+            err = sys_waitpid((int32_t)tf->tf_a0, (userptr_t)tf->tf_a1,
+                            (size_t)tf->tf_a2, &retval);
+            break;
         
 #endif
 	    default:
@@ -165,7 +171,7 @@ md_forkentry(struct trapframe *tf, unsigned long unused)
     own_stack_tf.tf_v0 = 0; // return 0 on child thread, indicating no problem.
     own_stack_tf.tf_a3 = 0; // same as above
     own_stack_tf.tf_epc += 4; // go to next instr after <fork> in user space !!important
-    int res;
+//    int res;
 //    res = as_copy((struct addrspace *)usermode_addrspace, &(curthread->t_vmspace));
 //    if (res) {
 //        kprintf("as_copy failed in md_forkentry\n");
@@ -174,6 +180,8 @@ md_forkentry(struct trapframe *tf, unsigned long unused)
 //    as_activate(curthread->t_vmspace);
 
     //kfree((struct addrspace *)usermode_addrspace);
+    //if (process_table[(int)(curthread->pid)].processSem == NULL) process_table[(int)(curthread->pid)].processSem = sem_create("process_sem", 0);
+    V(process_table[(int)(curthread->pid)].processSem);
     mips_usermode(&own_stack_tf);
     #else
 	/*

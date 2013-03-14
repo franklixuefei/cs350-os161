@@ -2,6 +2,7 @@
 #define _SYSCALL_H_
 #include "opt-A2.h"
 #include <types.h>
+#include <syscall.h>
 #include <machine/trapframe.h>
 
 /*

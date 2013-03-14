@@ -78,7 +78,7 @@ thread_create(const char *name)
             thread->pid = i;
             process_table[i].pid = i; // may not used
             process_table[i].active = 1;
-            process_table[i].parentWaiting = 0;
+            process_table[i].parentWaiting = 1;
             break;
         }
     }
@@ -257,6 +257,7 @@ thread_bootstrap(void)
         process_table[i].pid = 0;
         process_table[i].parentWaiting = 0;
         process_table[i].children = NULL;
+        process_table[i].processSem = sem_create("process_sem", 0);
         // FIXME may init more fields here.
     }
 #endif
@@ -296,6 +297,9 @@ thread_shutdown(void)
         if (process_table[i].children) {
             // FIXME here maybe destroy all children first
             array_destroy(process_table[i].children);
+        }
+        if (process_table[i].processSem) {
+            sem_destroy(process_table[i].processSem);
         }
     }
     //kfree(process_table);
@@ -357,13 +361,13 @@ thread_fork(const char *name,
             kprintf("as_copy failed in thread_fork, curthread_vmspace_addr: %p, newguy_vmspace_addr: %p\n", curthread->t_vmspace, newguy->t_vmspace);
             return res;
         }
-        as_activate(curthread->t_vmspace);
+//        as_activate(curthread->t_vmspace);
         //copy vnodes
         for(i=0;i<MAX_OPENED_FILES;i++) {
             if(curthread->files[i]!=NULL) {
                 newguy->files[i]=curthread->files[i];
-                VOP_INCREF(newguy->files[i]->vn);
                 VOP_INCOPEN(newguy->files[i]->vn);
+                //VOP_INCREF(newguy->files[i]->vn);
             } else {
                 break;
             }

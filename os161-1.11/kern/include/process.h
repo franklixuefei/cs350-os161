@@ -15,6 +15,7 @@ struct process {
     pid_t pid;
     int active; // init to 0
     struct array *children;
+    struct semaphore *processSem;
     int parentWaiting; // init to 0
 };
 
