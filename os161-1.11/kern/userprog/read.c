@@ -79,8 +79,13 @@ int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
 
     mk_kuio(&copyUIO, kerBuffer, buflen, file->offset, UIO_READ);
     result = VOP_READ(file->vn, &copyUIO);
+    if (result) {
+        return result;
+    }
     result = copyout(kerBuffer,buf, buflen);
-    
+    if (result) {
+        return result;
+    }
 
     *retval = buflen - copyUIO.uio_resid;
     file->offset = *retval;

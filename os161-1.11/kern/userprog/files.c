@@ -27,7 +27,7 @@ struct files * files_create(const char* filename, struct vnode *vn, int flags) {
 void files_destroy(struct files *files) {
     if (files != NULL) {
         kfree(files->filename);
-        if (files->vn->vn_refcount == 1) vnode_kill(files->vn);
+        if (files->vn->vn_refcount == 1 && files->vn->vn_refcount == 0) vnode_kill(files->vn);
         kfree(files);
     }
 }

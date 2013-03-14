@@ -405,7 +405,7 @@ _exit.o: ../../userprog/_exit.c opt-A2.h ../../include/syscall.h opt-A2.h \
   machine/pcb.h machine/setjmp.h ../../include/files.h \
   ../../include/vfs.h ../../include/curthread.h ../../include/process.h \
   ../../include/synch.h opt-A1.h ../../include/queue.h \
-  ../../include/array.h
+  ../../include/array.h ../../include/vnode.h
 files.o: ../../userprog/files.c opt-A2.h ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/lib.h machine/setjmp.h ../../include/kern/unistd.h \

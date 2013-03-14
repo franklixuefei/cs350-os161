@@ -107,6 +107,9 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
                 copyin (buf, klebuf, nbytes);
                 mk_kuio(&copyUIO, klebuf, nbytes, file->offset, UIO_WRITE);
                 result = VOP_WRITE (file->vn, &copyUIO);
+                if (result) {
+                    return result;
+                }
                 kfree(klebuf);
                 /*
 

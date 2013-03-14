@@ -364,7 +364,7 @@ thread_fork(const char *name,
         //        as_activate(curthread->t_vmspace);
         //copy vnodes
 //        spl = splhigh();
-        for(i=0;i<MAX_OPENED_FILES;i++) {
+        for(i=3;i<MAX_OPENED_FILES;i++) {
             if(curthread->files[i]!=NULL) {
                 newguy->files[i]=curthread->files[i];
                 VOP_INCOPEN(newguy->files[i]->vn);
