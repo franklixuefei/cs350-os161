@@ -331,7 +331,7 @@ loadelf.o: ../../userprog/loadelf.c ../../include/types.h machine/types.h \
   ../../include/elf.h ../../include/addrspace.h ../../include/vm.h \
   machine/vm.h opt-dumbvm.h ../../include/thread.h opt-A2.h machine/pcb.h \
   ../../include/curthread.h ../../include/vnode.h
-runprogram.o: ../../userprog/runprogram.c ../../include/types.h \
+runprogram.o: ../../userprog/runprogram.c opt-A2.h ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/kern/unistd.h ../../include/kern/errno.h \
   ../../include/lib.h machine/setjmp.h ../../include/addrspace.h \

@@ -12,6 +12,7 @@
 int sys_reboot(int code);
 
 #if OPT_A2
+#define MAX_ARGS 64
 // more stuff here
 void sys__exit(int exitcode);
 int sys_getpid(pid_t *retval);
