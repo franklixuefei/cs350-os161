@@ -92,20 +92,9 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
                     *retval = EBADF;
                     return -1;
                 }
-                /*
-                   if (((unsigned int)buf) < 0x80000000) {
-                 *retval = EFAULT;
-                 return -1;
-
-                 }
-                 if (((unsigned int)(buf + nbytes)) < 0x80000000 ) {
-                 *retval = EFAULT;
-                 return -1;
-                 }
-                 * */
                 void* klebuf = kmalloc (sizeof(nbytes));
                 copyin (buf, klebuf, nbytes);
-                mk_kuio(&copyUIO, klebuf, nbytes, file->offset, UIO_WRITE);
+                mk_kuio(&copyUIO, klebuf, nbytes, 0, UIO_WRITE);
                 result = VOP_WRITE (file->vn, &copyUIO);
                 if (result) {
                     return result;

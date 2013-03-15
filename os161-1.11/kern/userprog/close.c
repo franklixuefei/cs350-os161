@@ -27,7 +27,7 @@ int sys_close(int fd,  int32_t *retval) {
         return  -1; 
     }
     vfs_close(curthread->files[fd]->vn);
-    files_destroy(curthread->files[fd]);
+//    files_destroy(curthread->files[fd]);
     return 0;
 }
 #endif
