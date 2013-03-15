@@ -13,9 +13,7 @@
 //#include <curthread.h>
 //#include <vm.h>
 //#include <vfs.h>
-
 //#include <test.h>
-
 //
 ///*
 // * Load program "progname" and start running it in usermode.
@@ -68,9 +66,9 @@
 //	}
 //
 //	/* Warp to user mode. */
-//	md_usermode(0 /*argc*/, NULL /*userspace addr of argv*/,
+//	md_usermode(0 /*argc*/, NULL /*userspace addr of args*/,
 //		    stackptr, entrypoint);
-//
+//	
 //	/* md_usermode does not return */
 //	panic("md_usermode returned\n");
 //	return EINVAL;
@@ -102,16 +100,14 @@
  * Calls vfs_open on progname and thus may destroy it.
  */
 int
-runprogram(char *progname, char ** argv)
+runprogram(char *progname, char ** args, int argc)
 {
     struct vnode *v;
     vaddr_t entrypoint, stackptr;
     int result;
     
 #if OPT_A2
-    
-    int argc;
-    int i;
+    int padding;
 #endif
     
     /////////////////////////////////////////////////////////////
@@ -166,41 +162,36 @@ runprogram(char *progname, char ** argv)
     }
     
 #if OPT_A2
-
-    i = 0;
+    int i = 0;
     int j;
-    while(argv[i] != NULL) {
-        argc++;
-        i++;
-    }
     
     if (argc > MAX_ARGS) {
         return E2BIG;
     }
     
     stackptr -= (argc + 1) * sizeof(char*);
-    char **arg_ptrs = (char**)stackptr;
+    char**arg_ptrs = (char**)stackptr;
+    
 	for(i = 0; i < argc; ++i){
         j = 0;
-		while(argv[i][j] != '\0') {
+		while(args[i][j] != '\0') {
             j++;
         }
         j++;
 		stackptr -= j;
 		arg_ptrs[i] = (char *) stackptr;
-		memcpy(arg_ptrs[i],argv[i], j);
+		copyoutstr((const char*)args[i], (userptr_t)arg_ptrs[i], j, 0);
 	}
-	arg_ptrs[i] = NULL; // insert a NULL at the end.
-    int remainder = stackptr % 8;
-	if(remainder != 0) stackptr -= remainder; // make the stackptr aligned.
+    padding = stackptr % 8;
+	stackptr -= padding; // make the stackptr aligned.
     /* Warp to user mode. */
     md_usermode(argc,(userptr_t)arg_ptrs,stackptr, entrypoint);
-    
+
     
 #else
     
     /* Warp to user mode. */
-    md_usermode(0 /*argc*/, NULL /*userspace addr of argv*/,
+    md_usermode(0 /*argc*/, NULL /*userspace addr of args*/,
                 stackptr, entrypoint);
     
 #endif

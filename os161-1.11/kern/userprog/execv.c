@@ -31,7 +31,7 @@ sys_execv(const char* program, char **args, pid_t *retval)
 
     int result;
     int argc;
-    char**argv;
+    int padding;
     
     /* Open the file. */
     result = vfs_open(program, O_RDONLY, &v);
@@ -77,8 +77,9 @@ sys_execv(const char* program, char **args, pid_t *retval)
     
     int i = 0;
     int j;
-    while(argv[i] != NULL) {
+    while(args[i] != NULL) {
         argc++;
+        i++;
     }
     
     if (argc > MAX_ARGS) {
@@ -90,17 +91,16 @@ sys_execv(const char* program, char **args, pid_t *retval)
     char**arg_ptrs = (char**)stackptr;
     for(i = 0; i < argc; ++i){
         j = 0;
-        while(argv[i][j] != '\0') {
+        while(args[i][j] != '\0') {
             j++;
         }
-        j++;
+        j++; // including '\0'
         stackptr -= j;
         arg_ptrs[i] = (char *) stackptr;
-        memcpy(arg_ptrs[i],argv[i], j);
+        copyoutstr((const char*)args[i], (userptr_t)arg_ptrs[i], j, 0);
     }
-    arg_ptrs[i] = NULL; // insert a NULL at the end.
-    int remainder = stackptr % 8;
-    if(remainder != 0) stackptr -= remainder; // make the stackptr aligned.
+    padding = stackptr % 8;
+    stackptr -= padding; // make the stackptr aligned.
     /* Warp to user mode. */
     md_usermode(argc,(userptr_t)arg_ptrs,stackptr, entrypoint);
     
