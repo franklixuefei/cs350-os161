@@ -26,6 +26,30 @@
 int
 sys_execv(const char* program, char **args, pid_t *retval)
 {
+    if (program == NULL) {
+        *retval = EFAULT;
+        return -1;
+    }
+    
+    vaddr_t insbase1from = curthread->t_vmspace->as_vbase1;
+    vaddr_t insbase1to = curthread->t_vmspace->as_npages1 * PAGE_SIZE + insbase1from;
+    
+    vaddr_t datavbasefrom = curthread->t_vmspace->as_vbase2;
+    vaddr_t datavbaseto = curthread->t_vmspace->as_npages2 * PAGE_SIZE + datavbaseto;
+    
+    vaddr_t stackvbasefrom = curthread->t_vmspace->as_vbase1 - PAGE_SIZE*12;
+    vaddr_t stackvbaseto = curthread->t_vmspace->as_vbase1;
+    
+    if (program < 0x8000000 &&(
+                           withInRange(program, insbase1from, insbase1to) ||
+                           !withInRange(program, datavbasefrom, datavbaseto) ||
+                           !withInRange(program, stackvbasefrom, stackvbaseto))
+        ) {
+        *retval = EFAULT;
+        return -1;  
+    }
+
+    
     struct vnode *v;
     vaddr_t entrypoint, stackptr;
 

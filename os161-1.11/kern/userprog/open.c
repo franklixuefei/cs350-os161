@@ -19,6 +19,11 @@ int sys_open(const char *filename, int flags, pid_t *retval) {
         return -1;
     }
     struct vnode *vn = kmalloc(sizeof(struct vnode));
+    int result = vfs_open(kstrdup(filename), flags, &vn);
+    if (result) { 
+        *retval = EFAULT;
+        return -1;
+    }
     struct files *file = files_create(filename, vn, flags);
     if (file == NULL) {
         *retval = EFAULT;

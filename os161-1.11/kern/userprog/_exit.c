@@ -16,7 +16,7 @@
 void
 sys__exit(int exitcode) {
     // pass exitcode back into curthread.
-    process_table[curthread->pid].exitcode = exitcode;
+    process_table[(int)(curthread->pid)].exitcode = exitcode;
     // FIXME close all open files and free the file table entries
     int i;
 

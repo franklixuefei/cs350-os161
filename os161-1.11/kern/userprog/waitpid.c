@@ -17,12 +17,13 @@ int
 sys_waitpid(pid_t pid, int *status, int options, pid_t *retval)
 {
     int res, exitcode, i, numchildren, child_pid, spl;
+    struct process child_process = process_table[(int)pid];
+
     int found = 0;
     if (pid == 0 || options != 0) {
         *retval = EINVAL;
         return -1;
     }
-    struct process child_process = process_table[(int)pid];
     struct process cur_process = process_table[(int)(curthread->pid)];
     if (status == NULL) {
         // means process not found or status validity
@@ -30,7 +31,7 @@ sys_waitpid(pid_t pid, int *status, int options, pid_t *retval)
         *retval = EFAULT;
         return -1;
     }
-    
+
     numchildren = array_getnum(cur_process.children);
     
     //spl = splhigh();
@@ -45,7 +46,7 @@ sys_waitpid(pid_t pid, int *status, int options, pid_t *retval)
         
     }
     if (found) {
-        *status = child_process.exitcode;
+        
         array_remove(process_table[(int)(curthread->pid)].children, i);
         //            if (process.active == 0) {
         //                *retval = pid;
@@ -59,7 +60,8 @@ sys_waitpid(pid_t pid, int *status, int options, pid_t *retval)
             //process_table[(int)pid].parentWaiting = 1;
             //if (process_table[(int)(curthread->pid)].processSem == NULL) process_table[(int)(curthread->pid)].processSem = sem_create("process_sem", 0);
         P(process_table[(int)pid].processSem);
-            
+//        kprintf("exitcode: %d\n", child_process.exitcode);
+        *status = process_table[(int)pid].exitcode;
         //}
         *retval = pid;
         process_table[(int)pid].parentWaiting = 0;

@@ -56,7 +56,7 @@ int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
 
 
 
-    struct uio copyUIO;
+    struct uio *copyUIO = kmalloc(sizeof(struct uio));
     void *kerBuffer = kmalloc(sizeof (buflen));
     struct files *file = curthread->files[fd];
     vaddr_t insbase1from = curthread->t_vmspace->as_vbase1;
@@ -77,8 +77,10 @@ int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
         return -1;  
     }
 
-    mk_kuio(&copyUIO, kerBuffer, buflen, file->offset, UIO_READ);
-    result = VOP_READ(file->vn, &copyUIO);
+    mk_kuio(copyUIO, kerBuffer, buflen, file->offset, UIO_READ);
+    copyUIO->uio_offset = file->offset;
+    copyUIO->uio_resid = buflen - file->offset;
+    result = VOP_READ(file->vn, copyUIO);
     if (result) {
         return result;
     }
@@ -87,8 +89,9 @@ int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
         return result;
     }
 
-    *retval = buflen - copyUIO.uio_resid;
+    *retval = buflen - copyUIO->uio_resid;
     file->offset = *retval;
+    kfree(copyUIO);
     return 0;
 }
 

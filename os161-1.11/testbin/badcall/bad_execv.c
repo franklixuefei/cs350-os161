@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include <err.h>
-
 #include "config.h"
 #include "test.h"
 
@@ -34,6 +33,7 @@ exec_common_fork(void)
 		return -1;
 	}
 	if (status != MAGIC_STATUS) {
+        printf("status: %d\n", status);
 		warnx("FAILURE: wrong exit code of subprocess");
 	}
 	return 1;
