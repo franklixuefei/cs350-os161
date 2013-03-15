@@ -33,6 +33,7 @@ int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
         *retval = EBADF;
         return -1; 
     }
+    
 
 
     int result =0;
@@ -52,13 +53,16 @@ int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
         curthread->files[2] = files_create(kstrdup("con:"),vn, O_WRONLY);
         kfree(consolein);
     }
-    
 
 
 
     struct uio *copyUIO = kmalloc(sizeof(struct uio));
     void *kerBuffer = kmalloc(sizeof (buflen));
     struct files *file = curthread->files[fd];
+    if (file == NULL) {
+        *retval = EBADF;
+        return -1;
+    }
     vaddr_t insbase1from = curthread->t_vmspace->as_vbase1;
     vaddr_t insbase1to = curthread->t_vmspace->as_npages1 * PAGE_SIZE + insbase1from;
 
@@ -69,28 +73,26 @@ int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
     vaddr_t stackvbaseto = curthread->t_vmspace->as_vbase1;
 
     if (buf < 0x8000000 &&(
-            withInRange(buf, insbase1from, insbase1to) ||
-            withInRange(buf, datavbasefrom, datavbaseto) ||
-            withInRange(buf, stackvbasefrom, stackvbaseto))
-            ) {
+                withInRange(buf, insbase1from, insbase1to) ||
+                withInRange(buf, datavbasefrom, datavbaseto) ||
+                withInRange(buf, stackvbasefrom, stackvbaseto))
+       ) {
         *retval = EFAULT;
         return -1;  
     }
 
-    mk_kuio(copyUIO, kerBuffer, buflen, file->offset, UIO_READ);
-    copyUIO->uio_offset = file->offset;
-    copyUIO->uio_resid = buflen - file->offset;
+    mk_kuio(copyUIO, buf, buflen, file->offset, UIO_READ);
     result = VOP_READ(file->vn, copyUIO);
     if (result) {
         return result;
     }
-    result = copyout(kerBuffer,buf, buflen);
+//    result = copyout(kerBuffer,buf, buflen);
     if (result) {
         return result;
     }
 
     *retval = buflen - copyUIO->uio_resid;
-    file->offset = *retval;
+    file->offset += *retval;
     kfree(copyUIO);
     return 0;
 }

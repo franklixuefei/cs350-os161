@@ -47,7 +47,7 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
         curthread->files[2] = files_create(kstrdup("con:"),vn, O_WRONLY);
         kfree(consolein);
     }
-    
+
 
 
 
@@ -61,10 +61,10 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
     vaddr_t stackvbaseto = curthread->t_vmspace->as_vbase1;
 
     if (buf < 0x8000000 &&(
-            withInRange(buf, insbase1from, insbase1to) ||
-            !withInRange(buf, datavbasefrom, datavbaseto) ||
-            !withInRange(buf, stackvbasefrom, stackvbaseto))
-            ) {
+                withInRange(buf, insbase1from, insbase1to) ||
+                !withInRange(buf, datavbasefrom, datavbaseto) ||
+                !withInRange(buf, stackvbasefrom, stackvbaseto))
+       ) {
         *retval = EFAULT;
         return -1;  
     }
@@ -92,14 +92,15 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
                     *retval = EBADF;
                     return -1;
                 }
-                void* klebuf = kmalloc (sizeof(nbytes));
-                copyin (buf, klebuf, nbytes);
-                mk_kuio(&copyUIO, klebuf, nbytes, 0, UIO_WRITE);
+
+                //                void* klebuf = kmalloc (sizeof(nbytes));
+                //                copyin (buf, klebuf, nbytes);
+                mk_kuio(&copyUIO, (void*)buf, nbytes, file->offset, UIO_WRITE);
                 result = VOP_WRITE (file->vn, &copyUIO);
                 if (result) {
                     return result;
                 }
-                kfree(klebuf);
+                //kfree(klebuf);
                 /*
 
                    mk_kuio(&copyUIO, buf, nbytes, file->offset, UIO_WRITE);
@@ -107,10 +108,10 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
                    if (result == 0) {
                 // check if VOP_WRITE done
                 }else{
-                 *retval = nbytes - copyUIO.uio_resid;
-                 file->offset += *retval;
-                 }
-                 */
+                }
+                */
+                *retval = nbytes - copyUIO.uio_resid;
+                file->offset += *retval;
             }
     }
     return 0;

@@ -18,17 +18,17 @@
 int sys_close(int fd,  int32_t *retval) {
     if (fd >= MAX_OPENED_FILES || fd < 3) {
         *retval = EBADF; 
-        kprintf("fd exceeds max!\n");
-        return  -1; 
+        kprintf("invalid fd!\n");
+        return  -1;
     }
     if (curthread->files[fd] == NULL) {
         *retval = EBADF; 
         kprintf("file does not exist!\n");
-        return  -1; 
+        return  -1;
     }
     vfs_close(curthread->files[fd]->vn);
-     curthread->files[fd] = NULL;
-//    files_destroy(curthread->files[fd]);
+    //files_destroy(curthread->files[fd]);
+    curthread->files[fd] = NULL;
     return 0;
 }
 #endif

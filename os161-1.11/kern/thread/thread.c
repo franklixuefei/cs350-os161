@@ -366,7 +366,7 @@ thread_fork(const char *name,
 //        spl = splhigh();
         for(i=3;i<MAX_OPENED_FILES;i++) {
             if(curthread->files[i]!=NULL) {
-                newguy->files[i]=curthread->files[i];
+                newguy->files[i] = files_create(kstrdup(curthread->files[i]->filename), curthread->files[i]->vn, curthread->files[i]->flags);
                 VOP_INCOPEN(newguy->files[i]->vn);
                 VOP_INCREF(newguy->files[i]->vn);
             } else {
