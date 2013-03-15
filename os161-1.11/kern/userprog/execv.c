@@ -28,7 +28,7 @@ sys_execv(const char* program, char **args, pid_t *retval)
 {
     struct vnode *v;
     vaddr_t entrypoint, stackptr;
-    vaddr_t *arg_ptrs[MAX_ARGS];
+
     int result;
     int argc;
     char**argv;
@@ -75,7 +75,7 @@ sys_execv(const char* program, char **args, pid_t *retval)
         return result;
     }
     
-    i = 0;
+    int i = 0;
     int j;
     while(argv[i] != NULL) {
         argc++;
@@ -87,12 +87,13 @@ sys_execv(const char* program, char **args, pid_t *retval)
     }
     
     stackptr -= (argc + 1) * sizeof(char*);
-    
+    char**arg_ptrs = (char**)stackptr;
     for(i = 0; i < argc; ++i){
         j = 0;
         while(argv[i][j] != '\0') {
             j++;
         }
+        j++;
         stackptr -= j;
         arg_ptrs[i] = (char *) stackptr;
         memcpy(arg_ptrs[i],argv[i], j);

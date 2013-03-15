@@ -337,7 +337,7 @@ runprogram.o: ../../userprog/runprogram.c opt-A2.h ../../include/types.h \
   ../../include/lib.h machine/setjmp.h ../../include/addrspace.h \
   ../../include/vm.h machine/vm.h opt-dumbvm.h ../../include/thread.h \
   opt-A2.h machine/pcb.h ../../include/curthread.h ../../include/vfs.h \
-  ../../include/test.h
+  ../../include/test.h ../../include/syscall.h machine/trapframe.h
 uio.o: ../../userprog/uio.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/lib.h \
   machine/setjmp.h ../../include/uio.h ../../include/thread.h opt-A2.h \

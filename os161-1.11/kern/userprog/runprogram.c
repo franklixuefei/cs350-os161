@@ -13,7 +13,9 @@
 //#include <curthread.h>
 //#include <vm.h>
 //#include <vfs.h>
+
 //#include <test.h>
+
 //
 ///*
 // * Load program "progname" and start running it in usermode.
@@ -91,6 +93,7 @@
 #include <vm.h>
 #include <vfs.h>
 #include <test.h>
+#include <syscall.h>
 
 /*
  * Load program "progname" and start running it in usermode.
@@ -99,16 +102,16 @@
  * Calls vfs_open on progname and thus may destroy it.
  */
 int
-runprogram(char *progname, char ** args)
+runprogram(char *progname, char ** argv)
 {
     struct vnode *v;
     vaddr_t entrypoint, stackptr;
     int result;
     
 #if OPT_A2
-    vaddr_t *arg_ptrs[MAX_ARGS];
+    
     int argc;
-    char**argv;
+    int i;
 #endif
     
     /////////////////////////////////////////////////////////////
@@ -163,24 +166,26 @@ runprogram(char *progname, char ** args)
     }
     
 #if OPT_A2
+
     i = 0;
     int j;
     while(argv[i] != NULL) {
         argc++;
+        i++;
     }
     
     if (argc > MAX_ARGS) {
-        *retval = E2BIG;
-        return -1;
+        return E2BIG;
     }
     
     stackptr -= (argc + 1) * sizeof(char*);
-    
+    char **arg_ptrs = (char**)stackptr;
 	for(i = 0; i < argc; ++i){
         j = 0;
 		while(argv[i][j] != '\0') {
             j++;
         }
+        j++;
 		stackptr -= j;
 		arg_ptrs[i] = (char *) stackptr;
 		memcpy(arg_ptrs[i],argv[i], j);
