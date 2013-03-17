@@ -17,21 +17,26 @@ int
 sys_waitpid(pid_t pid, int *status, int options, pid_t *retval)
 {
     int res, exitcode, i, numchildren, child_pid, spl;
-    struct process child_process = process_table[(int)pid];
 
     int found = 0;
-    if (pid == 0 || options != 0) {
-        *retval = EINVAL;
-        return -1;
-    }
-    struct process cur_process = process_table[(int)(curthread->pid)];
-    if (status == NULL) {
-        // means process not found or status validity
-        //kprintf("haha\n");
+    
+    if (status <= 0x0 || status >= 0x80000000 || status == 0x40000000 || (int)status % sizeof(char*) != 0) {
         *retval = EFAULT;
         return -1;
     }
-
+    if (pid <= 0 || pid > MAX_FORKED_PROCESSES || options != 0) {
+        *retval = EINVAL;
+        return -1;
+    }
+    
+    if (process_table[(int)(curthread->pid)].children == NULL) { // I'm a child
+        *retval = EFAULT;
+        return -1;
+    }
+    
+    struct process cur_process = process_table[(int)(curthread->pid)];
+    struct process child_process = process_table[(int)pid];
+    
     numchildren = array_getnum(cur_process.children);
     
     //spl = splhigh();

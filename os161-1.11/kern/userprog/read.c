@@ -18,22 +18,17 @@
 #include <files.h>
 #include <addrspace.h>
 
-int
-withInRange (vaddr_t addr, vaddr_t from, vaddr_t to){
-    return ((addr > from) && (addr < to));
-}
-
 
 int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
-    if (fd >= MAX_OPENED_FILES ) {
+    if (fd >= MAX_OPENED_FILES  || fd < 0) {
         *retval = EBADF;
         return -1;
     }
-    if (fd < 0) {
-        *retval = EBADF;
-        return -1; 
-    }
     
+    if (buf <= 0x0 || buf + buflen <= 0x0 || buf >= 0x80000000|| buf + buflen >= 0x80000000 || buf == 0x40000000 || buf + buflen == 0x40000000) {
+        *retval = EFAULT;
+        return -1;
+    }
 
 
     int result =0;
@@ -62,23 +57,6 @@ int sys_read(int fd, void *buf, size_t buflen, int32_t *retval){
     if (file == NULL) {
         *retval = EBADF;
         return -1;
-    }
-    vaddr_t insbase1from = curthread->t_vmspace->as_vbase1;
-    vaddr_t insbase1to = curthread->t_vmspace->as_npages1 * PAGE_SIZE + insbase1from;
-
-    vaddr_t datavbasefrom = curthread->t_vmspace->as_vbase2;
-    vaddr_t datavbaseto = curthread->t_vmspace->as_npages2 * PAGE_SIZE + datavbaseto;
-
-    vaddr_t stackvbasefrom = curthread->t_vmspace->as_vbase1 - PAGE_SIZE*12;
-    vaddr_t stackvbaseto = curthread->t_vmspace->as_vbase1;
-
-    if (buf < 0x8000000 &&(
-                withInRange(buf, insbase1from, insbase1to) ||
-                withInRange(buf, datavbasefrom, datavbaseto) ||
-                withInRange(buf, stackvbasefrom, stackvbaseto))
-       ) {
-        *retval = EFAULT;
-        return -1;  
     }
 
     mk_kuio(copyUIO, buf, buflen, file->offset, UIO_READ);

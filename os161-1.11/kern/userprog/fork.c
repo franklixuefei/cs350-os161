@@ -66,7 +66,7 @@ sys_fork(struct trapframe* tf, pid_t *retval)
     }
     
 
-    if (process_table[(int)(curthread->pid)].children == NULL) {
+    if (process_table[(int)(curthread->pid)].children == NULL) { // lazy init'n
         process_table[(int)(curthread->pid)].children = array_create();
         if (process_table[(int)(curthread->pid)].children == NULL) {
             *retval = ENOMEM;

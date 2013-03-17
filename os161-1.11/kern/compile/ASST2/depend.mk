@@ -418,7 +418,7 @@ open.o: ../../userprog/open.c opt-A2.h ../../include/types.h \
   machine/pcb.h ../../include/curthread.h ../../include/vnode.h \
   ../../include/uio.h ../../include/syscall.h machine/trapframe.h \
   ../../include/kern/unistd.h ../../include/kern/errno.h \
-  ../../include/vfs.h ../../include/files.h
+  ../../include/vfs.h ../../include/files.h ../../include/kern/limits.h
 close.o: ../../userprog/close.c opt-A2.h ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/lib.h machine/setjmp.h ../../include/kern/errno.h \

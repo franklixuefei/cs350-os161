@@ -59,10 +59,10 @@ wait_unaligned(void)
 
 	/* start with proper integer alignment */
 	ptr = (char *)(&status[0]);
-
+    //printf("proper: %p\n", ptr);
 	/* generate improper alignment on platforms with restrictions*/
 	ptr++;
-
+    //printf("improper: %p\n", ptr);
 	rv = waitpid(pid, (int *)ptr, 0);
 	report_survival(rv, errno, "wait with unaligned status");
 	if (rv<0) {

@@ -26,30 +26,21 @@
 int
 sys_execv(const char* program, char **args, pid_t *retval)
 {
-//    if (program == NULL) {
-//        *retval = EFAULT;
-//        return -1;
-//    }
-//    
-//    vaddr_t insbase1from = curthread->t_vmspace->as_vbase1;
-//    vaddr_t insbase1to = curthread->t_vmspace->as_npages1 * PAGE_SIZE + insbase1from;
-//    
-//    vaddr_t datavbasefrom = curthread->t_vmspace->as_vbase2;
-//    vaddr_t datavbaseto = curthread->t_vmspace->as_npages2 * PAGE_SIZE + datavbaseto;
-//    
-//    vaddr_t stackvbasefrom = curthread->t_vmspace->as_vbase1 - PAGE_SIZE*12;
-//    vaddr_t stackvbaseto = curthread->t_vmspace->as_vbase1;
-//    
-//    if (program < 0x8000000 &&(
-//                           withInRange(program, insbase1from, insbase1to) ||
-//                           !withInRange(program, datavbasefrom, datavbaseto) ||
-//                           !withInRange(program, stackvbasefrom, stackvbaseto))
-//        ) {
-//        *retval = EFAULT;
-//        return -1;  
-//    }
-    if (program <= 0x0 || program >= 0x40000000 || args <= 0x0 || args >= 0x40000000) {
+    if (program <= 0x0 || program >= 0x80000000 || program == 0x40000000 || args <= 0x0 || args >= 0x80000000 || args == 0x40000000) {
         *retval = EFAULT;
+        return -1;
+    }
+    int i = 0;
+    while(args[i] != NULL) {
+        if (args[i] <= 0x0 || args[i] >= 0x80000000 || args[i] == 0x40000000) {
+            *retval = EFAULT;
+            return -1;
+        }
+        i++;
+    }
+    
+    if (strlen(program) == 0) {
+        *retval = EINVAL;
         return -1;
     }
     
@@ -102,7 +93,7 @@ sys_execv(const char* program, char **args, pid_t *retval)
         return result;
     }
     
-    int i = 0;
+    
     int j;
     while(args[i] != NULL) {
         argc++;

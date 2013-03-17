@@ -12,10 +12,37 @@
 #include <kern/errno.h>
 #include <vfs.h>
 #include <files.h>
+#include <kern/limits.h>
 
 int sys_open(const char *filename, int flags, pid_t *retval) {
-    if (filename == NULL) {
+    if (filename <= 0x0 || filename >= 0x80000000 || filename == 0x40000000) {
         *retval = EFAULT;
+        return -1;
+    }
+    if (strlen(filename) == 0) {
+        *retval = EINVAL;
+        return -1;
+    }
+
+    if (flags != O_RDONLY && flags != O_WRONLY && flags != O_RDWR &&
+        
+        flags != (O_RDONLY|O_CREAT) && flags != (O_RDONLY|O_EXCL) && flags != (O_RDONLY|O_TRUNC) && flags != (O_RDONLY|O_APPEND) &&
+        flags != (O_WRONLY|O_CREAT) && flags != (O_WRONLY|O_EXCL) && flags != (O_WRONLY|O_TRUNC) && flags != (O_WRONLY|O_APPEND) &&
+        flags != (O_RDWR|O_CREAT) && flags != (O_RDWR|O_EXCL) && flags != (O_RDWR|O_TRUNC) && flags != (O_RDWR|O_APPEND) &&
+        
+        flags != (O_RDONLY|O_CREAT|O_EXCL) && flags != (O_RDONLY|O_CREAT|O_TRUNC) && flags != (O_RDONLY|O_CREAT|O_APPEND) &&
+        flags != (O_RDONLY|O_EXCL|O_TRUNC) && flags != (O_RDONLY|O_EXCL|O_APPEND) &&
+        flags != (O_RDONLY|O_TRUNC|O_APPEND) &&
+        
+        flags != (O_WRONLY|O_CREAT|O_EXCL) && flags != (O_WRONLY|O_CREAT|O_TRUNC) && flags != (O_WRONLY|O_CREAT|O_APPEND) &&
+        flags != (O_WRONLY|O_EXCL|O_TRUNC) && flags != (O_WRONLY|O_EXCL|O_APPEND) &&
+        flags != (O_WRONLY|O_TRUNC|O_APPEND) &&
+        
+        flags != (O_RDWR|O_CREAT|O_EXCL) && flags != (O_RDWR|O_CREAT|O_TRUNC) && flags != (O_RDWR|O_CREAT|O_APPEND) &&
+        flags != (O_RDWR|O_EXCL|O_TRUNC) && flags != (O_RDWR|O_EXCL|O_APPEND) &&
+        flags != (O_RDWR|O_TRUNC|O_APPEND)) {
+//        kprintf("invalid flags!\n");
+        *retval = EINVAL;
         return -1;
     }
     struct vnode *vn = kmalloc(sizeof(struct vnode));

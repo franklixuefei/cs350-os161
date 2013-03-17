@@ -21,14 +21,21 @@
 
 int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
 {
-    if (fd >= MAX_OPENED_FILES ) {
-        *retval = EBADF;
-        return -1;
-    }
     if (fd < 0) {
         *retval = EBADF;
         return -1;
     }
+    if (fd >= MAX_OPENED_FILES) {
+        *retval = EBADF;
+        //kprintf("invalid fd!\n");
+        return  -1;
+    }
+
+    if (buf <= 0x0 || buf + nbytes <= 0x0 || buf >= 0x80000000|| buf + nbytes >= 0x80000000 || buf == 0x40000000 || buf + nbytes == 0x40000000) {
+        *retval = EFAULT;
+        return -1;
+    }
+
 
     int result =0;
     if (fd < 3 && ((curthread->files[fd] == NULL))) {
@@ -48,28 +55,6 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
         kfree(consolein);
     }
 
-
-
-
-    vaddr_t insbase1from = curthread->t_vmspace->as_vbase1;
-    vaddr_t insbase1to = curthread->t_vmspace->as_npages1 * PAGE_SIZE + insbase1from;
-
-    vaddr_t datavbasefrom = curthread->t_vmspace->as_vbase2;
-    vaddr_t datavbaseto = curthread->t_vmspace->as_npages2 * PAGE_SIZE + datavbaseto;
-
-    vaddr_t stackvbasefrom = curthread->t_vmspace->as_vbase1 - PAGE_SIZE*12;
-    vaddr_t stackvbaseto = curthread->t_vmspace->as_vbase1;
-
-    if (buf < 0x8000000 &&(
-                withInRange(buf, insbase1from, insbase1to) ||
-                !withInRange(buf, datavbasefrom, datavbaseto) ||
-                !withInRange(buf, stackvbasefrom, stackvbaseto))
-       ) {
-        *retval = EFAULT;
-        return -1;  
-    }
-
-
     struct uio copyUIO;
 
     switch (fd) {
@@ -79,7 +64,7 @@ int sys_write(int fd, const void *buf, size_t nbytes, int32_t *retval)
         case 1:
         case 2:
             {
-                int i = 0;
+                int i;
                 for (i = 0; i < nbytes; i++) {
                     putch(((char*)buf)[i]);
                 }
