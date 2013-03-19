@@ -444,6 +444,61 @@ hello.o: ${S}/main/hello.c
 SRCS+=${S}/main/hello.c
 OBJS+=hello.o
 
+foodcourt.o: ${S}/asst1/foodcourt.c
+	${COMPILE.c} ${S}/asst1/foodcourt.c
+SRCS+=${S}/asst1/foodcourt.c
+OBJS+=foodcourt.o
+
+getpid.o: ${S}/userprog/getpid.c
+	${COMPILE.c} ${S}/userprog/getpid.c
+SRCS+=${S}/userprog/getpid.c
+OBJS+=getpid.o
+
+waitpid.o: ${S}/userprog/waitpid.c
+	${COMPILE.c} ${S}/userprog/waitpid.c
+SRCS+=${S}/userprog/waitpid.c
+OBJS+=waitpid.o
+
+_exit.o: ${S}/userprog/_exit.c
+	${COMPILE.c} ${S}/userprog/_exit.c
+SRCS+=${S}/userprog/_exit.c
+OBJS+=_exit.o
+
+files.o: ${S}/userprog/files.c
+	${COMPILE.c} ${S}/userprog/files.c
+SRCS+=${S}/userprog/files.c
+OBJS+=files.o
+
+open.o: ${S}/userprog/open.c
+	${COMPILE.c} ${S}/userprog/open.c
+SRCS+=${S}/userprog/open.c
+OBJS+=open.o
+
+close.o: ${S}/userprog/close.c
+	${COMPILE.c} ${S}/userprog/close.c
+SRCS+=${S}/userprog/close.c
+OBJS+=close.o
+
+read.o: ${S}/userprog/read.c
+	${COMPILE.c} ${S}/userprog/read.c
+SRCS+=${S}/userprog/read.c
+OBJS+=read.o
+
+write.o: ${S}/userprog/write.c
+	${COMPILE.c} ${S}/userprog/write.c
+SRCS+=${S}/userprog/write.c
+OBJS+=write.o
+
+fork.o: ${S}/userprog/fork.c
+	${COMPILE.c} ${S}/userprog/fork.c
+SRCS+=${S}/userprog/fork.c
+OBJS+=fork.o
+
+execv.o: ${S}/userprog/execv.c
+	${COMPILE.c} ${S}/userprog/execv.c
+SRCS+=${S}/userprog/execv.c
+OBJS+=execv.o
+
 uw-vmstats.o: ${S}/vm/uw-vmstats.c
 	${COMPILE.c} ${S}/vm/uw-vmstats.c
 SRCS+=${S}/vm/uw-vmstats.c
