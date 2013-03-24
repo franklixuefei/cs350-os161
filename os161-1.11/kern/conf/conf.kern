@@ -472,5 +472,8 @@ file	  userprog/execv.c
 defoption A3
    file    vm/uw-vmstats.c
 defoption A4
+    file   vm/vm_tlb.c
+
+#endif
 defoption A5
 

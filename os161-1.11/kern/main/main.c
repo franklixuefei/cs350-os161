@@ -16,7 +16,14 @@
 #include <vm.h>
 #include <syscall.h>
 #include <version.h>
+
 #include "opt-A0.h"
+#include "opt-A3.h"
+#if OPT_A3   
+
+#include "uw-vmstats.h"
+
+#endif
 
 /*
  * These two pieces of data are maintained by the makefiles and build system.
@@ -80,6 +87,11 @@ boot(void)
 	thread_bootstrap();
 	vfs_bootstrap();
 	dev_bootstrap();
+#if OPT_A3   
+
+        vmstats_init();
+
+#endif
 	vm_bootstrap();
 	kprintf_bootstrap();
 
@@ -107,6 +119,13 @@ shutdown(void)
 	vfs_clearbootfs();
 	vfs_clearcurdir();
 	vfs_unmountall();
+
+#if OPT_A3    
+
+        vmstats_print();
+
+#endif
+
 
 	splhigh();
 

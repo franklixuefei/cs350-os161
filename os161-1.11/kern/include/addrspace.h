@@ -4,6 +4,7 @@
 #include <vm.h>
 #include "opt-dumbvm.h"
 
+#define DUMBVM_STACKPAGES    12
 struct vnode;
 
 /* 

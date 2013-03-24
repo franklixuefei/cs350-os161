@@ -504,6 +504,11 @@ uw-vmstats.o: ${S}/vm/uw-vmstats.c
 SRCS+=${S}/vm/uw-vmstats.c
 OBJS+=uw-vmstats.o
 
+vm_tlb.o: ${S}/vm/vm_tlb.c
+	${COMPILE.c} ${S}/vm/vm_tlb.c
+SRCS+=${S}/vm/vm_tlb.c
+OBJS+=vm_tlb.o
+
 autoconf.o: ${S}/compile/ASST3/autoconf.c
 	${COMPILE.c} ${S}/compile/ASST3/autoconf.c
 SRCS+=${S}/compile/ASST3/autoconf.c

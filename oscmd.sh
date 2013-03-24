@@ -40,6 +40,6 @@ alias firegdb="cd ~/cs350-os161/;./firegdb.sh"
 alias buildos0="cd ~/cs350-os161/os161-1.11/kern/compile/ASST0;make depend;make;cd ~/cs350-os161/os161-1.11/kern/compile/ASST0;make install; cd -"
 alias buildos1="cd ~/cs350-os161/os161-1.11/kern/compile/ASST1;make depend;make;cd ~/cs350-os161/os161-1.11/kern/compile/ASST1;make install; cd -"
 alias buildos2="cd ~/cs350-os161/os161-1.11/kern/compile/ASST2;make depend;make;cd ~/cs350-os161/os161-1.11/kern/compile/ASST2;make install; cd -"
-alias buildos3="cd ~/cs350-os161/os161-1.11/kern/compile/ASST3;make depend;make;cd ~/cs350-os161/os161-1.11/kern/compile/ASST2;make install; cd -"
+alias buildos3="cd ~/cs350-os161/os161-1.11/kern/compile/ASST3;make depend;make;cd ~/cs350-os161/os161-1.11/kern/compile/ASST3;make install; cd -"
 
 

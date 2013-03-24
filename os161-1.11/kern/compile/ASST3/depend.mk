@@ -315,7 +315,8 @@ main.o: ../../main/main.c ../../include/types.h machine/types.h \
   ../../include/queue.h ../../include/thread.h opt-A2.h machine/pcb.h \
   ../../include/scheduler.h ../../include/dev.h ../../include/vfs.h \
   ../../include/vm.h machine/vm.h ../../include/syscall.h \
-  machine/trapframe.h ../../include/version.h opt-A0.h
+  machine/trapframe.h ../../include/version.h opt-A0.h opt-A3.h \
+  ../../include/uw-vmstats.h opt-A3.h
 menu.o: ../../main/menu.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/kern/errno.h \
   ../../include/kern/unistd.h ../../include/kern/limits.h \
@@ -466,6 +467,12 @@ uw-vmstats.o: ../../vm/uw-vmstats.c opt-A3.h ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/lib.h machine/setjmp.h ../../include/synch.h opt-A1.h \
   ../../include/queue.h machine/spl.h ../../include/uw-vmstats.h opt-A3.h
+vm_tlb.o: ../../vm/vm_tlb.c ../../include/types.h machine/types.h \
+  ../../include/kern/types.h machine/ktypes.h ../../include/addrspace.h \
+  ../../include/vm.h machine/vm.h opt-dumbvm.h machine/spl.h \
+  machine/tlb.h ../../include/curthread.h ../../include/thread.h opt-A2.h \
+  machine/pcb.h machine/setjmp.h ../../include/lib.h \
+  ../../include/kern/errno.h ../../include/uw-vmstats.h opt-A3.h opt-A3.h
 autoconf.o: ../../compile/ASST3/autoconf.c ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/lib.h machine/setjmp.h ../../compile/ASST3/autoconf.h
