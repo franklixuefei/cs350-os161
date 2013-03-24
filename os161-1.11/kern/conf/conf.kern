@@ -473,6 +473,7 @@ defoption A3
    file    vm/uw-vmstats.c
 defoption A4
     file   vm/vm_tlb.c
+    file   vm/pt.c
 
 #endif
 defoption A5

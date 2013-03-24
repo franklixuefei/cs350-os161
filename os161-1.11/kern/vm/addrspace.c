@@ -3,15 +3,17 @@
 #include <lib.h>
 #include <addrspace.h>
 #include <vm.h>
-
+#include <vfs.h>
+#include <kern/unistd.h>
+#include "pt.h"
 /*
  * Note! If OPT_DUMBVM is set, as is the case until you start the VM
  * assignment, this file is not compiled or linked or in any way
  * used. The cheesy hack versions in dumbvm.c are used instead.
  */
 
-struct addrspace *
-as_create(void)
+struct addrspace * 
+as_create(char* programName)
 {
 	struct addrspace *as = kmalloc(sizeof(struct addrspace));
 	if (as==NULL) {
@@ -21,16 +23,56 @@ as_create(void)
 	/*
 	 * Initialize as needed.
 	 */
+        char *copyProgramName = kstrdup(programName);
+        vfs_open(copyProgramName, O_RDONLY, &(as->elf_file_vnode));
+       // kfree(copyProgramName);
+        as->progName = copyProgramName;
 
+        // This will be kmalloced in [as_define_region]
+        as->pt_data = NULL;
+        as->pt_code = NULL;
+        as->as_vbase1 = 0;
+	as->as_npages1 =0;
+	as->as_vbase2 =0;
+	as->as_npages2 =0;
+
+        //
+        as->pt_stack = kmalloc(sizeof(struct Pte)*VM_STACKPAGES);
+        
 	return as;
 }
+
+
+
+
+void
+as_destroy(struct addrspace *as)
+{
+	/*
+	 * Clean up as needed.
+	 */
+        if (as->pt_data != NULL) {
+            kfree(as->pt_data);
+        }
+        if (as->pt_code != NULL) {
+            kfree(as->pt_code);
+        }
+        if (as->pt_stack != NULL) {
+            kfree(as->pt_stack);
+        }
+        kfree(as->progName);
+        vfs_close(as->elf_file_vnode);
+	kfree(as);
+}
+
+
 
 int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
 	struct addrspace *newas;
 
-	newas = as_create();
+	newas = as_create(old->progName);
 	if (newas==NULL) {
 		return ENOMEM;
 	}
@@ -44,24 +86,13 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	*ret = newas;
 	return 0;
 }
-
-void
-as_destroy(struct addrspace *as)
-{
-	/*
-	 * Clean up as needed.
-	 */
-	
-	kfree(as);
-}
-
 void
 as_activate(struct addrspace *as)
 {
 	/*
 	 * Write this.
 	 */
-
+        
 	(void)as;  // suppress warning until code gets written
 }
 

@@ -1,3 +1,11 @@
+#include "opt-A3.h"
+
+#if OPT_A3   
+
+
+
+
+
 #include <types.h>
 #include <addrspace.h>
 #include <vm.h>
@@ -8,7 +16,6 @@
 #include <lib.h>
 #include <kern/errno.h>
 #include <uw-vmstats.h>
-#include "opt-A3.h"
 
 
 int
@@ -40,18 +47,13 @@ vm_fault(int faulttype, vaddr_t faultaddress)
     
 	switch (faulttype) {
             case VM_FAULT_READONLY:
-#if OPT_A3
-            return EFAULT;
-#else
-            /* We always create pages read-write, so we can't get this */
-            panic("dumbvm: got VM_FAULT_READONLY\n");
-#endif
+                return EFAULT;
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
-            break;
+                break;
 	    default:
-            splx(spl);
-            return EINVAL;
+                 splx(spl);
+                return EINVAL;
 	}
     
 	as = curthread->t_vmspace;
@@ -64,8 +66,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		return EFAULT;
 	}
     
-	/* Assert that the address space has been set up properly. */
-	assert(as->as_vbase1 != 0);
+	/* Assert that the address space has been set up properly.
+	assert(as->as_vbase1  != 0);
 	assert(as->as_pbase1 != 0);
 	assert(as->as_npages1 != 0);
 	assert(as->as_vbase2 != 0);
@@ -99,41 +101,34 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		return EFAULT;
 	}
     
-	/* make sure it's page-aligned */
-	assert((paddr & PAGE_FRAME)==paddr);
-#if OPT_A3    
+     make sure it's page-aligned */
 
-       int res;
-       res = tlb_get_rr_victim();
-       TLB_Read(&ehi, &elo, res);
+        Pte * faultPte = NULL;
+        int errNum = -1;
+        errNum = probePte(faultaddress, faultPte);
+        paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);     
+        assert((paddr & PAGE_FRAME)==paddr);
+
+
+       i = tlb_get_rr_victim();
+        if (faultPte->flag & PTE_RDONLY) {
+            paddr |= TLBLO_VALID;
+        }else{
+            paddr |= TLBLO_VALID | TLBLO_DIRTY;
+        }
+
+       TLB_Read(&ehi, &elo, i);
        if (elo & TLBLO_VALID) {
             vmstats_inc(VMSTAT_TLB_FAULT_REPLACE);
        } else {   
             vmstats_inc(VMSTAT_TLB_FAULT_FREE);
        }
+
+       
         DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
-	TLB_Write(ehi, elo, i);
+	TLB_Write(faultaddress, paddr, i);
 	splx(spl);
 	return 0;
-
-#else
-
-	for (i=0; i<NUM_TLB; i++) {
-		TLB_Read(&ehi, &elo, i);
-		if (elo & TLBLO_VALID) {
-			continue;
-		}
-		ehi = faultaddress;
-		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
-		TLB_Write(ehi, elo, i);
-		splx(spl);
-		return 0;
-	}
-    
-	kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
-#endif
-	splx(spl);
-	return EFAULT;
 }
 
+#endif

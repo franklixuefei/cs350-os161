@@ -509,6 +509,11 @@ vm_tlb.o: ${S}/vm/vm_tlb.c
 SRCS+=${S}/vm/vm_tlb.c
 OBJS+=vm_tlb.o
 
+pt.o: ${S}/vm/pt.c
+	${COMPILE.c} ${S}/vm/pt.c
+SRCS+=${S}/vm/pt.c
+OBJS+=pt.o
+
 autoconf.o: ${S}/compile/ASST3/autoconf.c
 	${COMPILE.c} ${S}/compile/ASST3/autoconf.c
 SRCS+=${S}/compile/ASST3/autoconf.c

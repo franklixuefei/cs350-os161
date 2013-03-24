@@ -134,7 +134,7 @@ runprogram(char *progname, char ** args, int argc)
     assert(curthread->t_vmspace == NULL);
     
     /* Create a new address space. */
-    curthread->t_vmspace = as_create();
+    curthread->t_vmspace = as_create(progname);
     if (curthread->t_vmspace==NULL) {
         vfs_close(v);
         return ENOMEM;

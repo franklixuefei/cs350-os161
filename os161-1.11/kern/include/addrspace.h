@@ -3,8 +3,19 @@
 
 #include <vm.h>
 #include "opt-dumbvm.h"
+#include "opt-A3.h"
+
+
+
+#if OPT_A3   
+
+
+#define VM_STACKPAGES    12
+#else
 
 #define DUMBVM_STACKPAGES    12
+#endif
+
 struct vnode;
 
 /* 
@@ -25,13 +36,21 @@ struct addrspace {
 	paddr_t as_stackpbase;
 #else
 	/* Put stuff here for your VM system */
-    vaddr_t as_vbase1;
-	paddr_t as_pbase1;
+        // ins
+        vaddr_t as_vbase1;
 	size_t as_npages1;
+//	paddr_t as_pbase1;
 	vaddr_t as_vbase2;
-	paddr_t as_pbase2;
 	size_t as_npages2;
-	paddr_t as_stackpbase;
+//	paddr_t as_pbase2;
+//	paddr_t as_stackpbase;
+
+        struct vnode *elf_file_vnode;
+        struct Pte *pt_code;
+        struct Pte *pt_data;
+        struct Pte *pt_stack;
+        char* progName;
+
 #endif
 };
 
@@ -69,7 +88,7 @@ struct addrspace {
  *                back the initial stack pointer for the new process.
  */
 
-struct addrspace *as_create(void);
+struct addrspace *as_create(char* programName);
 int               as_copy(struct addrspace *src, struct addrspace **ret);
 void              as_activate(struct addrspace *);
 void              as_destroy(struct addrspace *);

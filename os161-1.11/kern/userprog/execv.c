@@ -66,7 +66,7 @@ sys_execv(const char* program, char **args, pid_t *retval)
     // assert(curthread->t_vmspace == NULL);
     
     /* Create a new address space. */
-    curthread->t_vmspace = as_create();
+    curthread->t_vmspace = as_create(program);
     if (curthread->t_vmspace==NULL) {
         vfs_close(v);
         return ENOMEM;
