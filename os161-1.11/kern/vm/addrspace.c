@@ -6,6 +6,7 @@
 #include <vfs.h>
 #include <kern/unistd.h>
 #include "pt.h"
+#include <vnode.h>
 /*
  * Note! If OPT_DUMBVM is set, as is the case until you start the VM
  * assignment, this file is not compiled or linked or in any way
@@ -32,9 +33,9 @@ as_create(char* programName)
         as->pt_data = NULL;
         as->pt_code = NULL;
         as->as_vbase1 = 0;
-	as->as_npages1 =0;
-	as->as_vbase2 =0;
-	as->as_npages2 =0;
+	as->as_npages1 = 0;
+	as->as_vbase2 = 0;
+	as->as_npages2 = 0;
 
         //
         as->pt_stack = kmalloc(sizeof(struct Pte)*VM_STACKPAGES);

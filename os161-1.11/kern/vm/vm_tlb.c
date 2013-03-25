@@ -1,10 +1,6 @@
 #include "opt-A3.h"
 
-#if OPT_A3   
-
-
-
-
+#if OPT_A3
 
 #include <types.h>
 #include <addrspace.h>
@@ -16,7 +12,7 @@
 #include <lib.h>
 #include <kern/errno.h>
 #include <uw-vmstats.h>
-
+#include "pt.h"
 
 int
 tlb_get_rr_victim()
@@ -32,7 +28,7 @@ tlb_get_rr_victim()
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
-	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
+//	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
 	paddr_t paddr;
 	int i;
 	u_int32_t ehi, elo;
@@ -103,7 +99,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
     
      make sure it's page-aligned */
 
-        Pte * faultPte = NULL;
+        struct Pte * faultPte = NULL;
         int errNum = -1;
         errNum = probePte(faultaddress, faultPte);
         paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);     

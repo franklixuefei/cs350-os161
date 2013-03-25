@@ -38,7 +38,9 @@
 
 
 int
-calculate_segment (vaddr_t vaddr, int* rValue){
+calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
+
+	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
         assert(as->as_vbase1 != 0);
 	assert(as->as_npages1 != 0);
 	assert(as->as_vbase2 != 0);
@@ -55,16 +57,16 @@ calculate_segment (vaddr_t vaddr, int* rValue){
 	stackbase = USERSTACK - VM_STACKPAGES * PAGE_SIZE;
 	stacktop = USERSTACK;
 
-	if (faultaddress >= vbase1 && faultaddress < vtop1) {
+	if (vaddr >= vbase1 && vaddr < vtop1) {
             *rValue =PT_CODE;
             return 0;
         }
-	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
+	else if (vaddr >= vbase2 && vaddr < vtop2) {
             *rValue =PT_DATA;
             return 0;
         
 	}
-	else if (faultaddress >= stackbase && faultaddress < stacktop) {
+	else if (vaddr >= stackbase && vaddr < stacktop) {
              *rValue =PT_STACK;
              return 0;
 	}
@@ -78,20 +80,26 @@ calculate_segment (vaddr_t vaddr, int* rValue){
     
 int
 probePte (vaddr_t vaddr , struct Pte *rPte) {
+    struct addrspace *as;
     int segNum = -1;
     int errCode = -1;
 
-    errCode = calculate_segment(vaddr, &segNum);
+    as = curthread->t_vmspace;
+    if (as == NULL) {
+        return EFAULT;
+    }
+
+    errCode = calculate_segment(as, vaddr, &segNum);
     if (errCode) {
         return errCode;
     }
 
     switch (segNum){
         case PT_CODE:
-            *rPte = as->pt_code[(vaddr - as->vbase1)/PAGE_SIZE];
+            *rPte = as->pt_code[(vaddr - as->as_vbase1)/PAGE_SIZE];
             break;
         case PT_DATA:
-            *rPte = as->pt_code[(vaddr - as->vbase2)/PAGE_SIZE];
+            *rPte = as->pt_code[(vaddr - as->as_vbase2)/PAGE_SIZE];
             break;
         case PT_STACK:
             *rPte = as->pt_code[(USERSTACK - vaddr)/PAGE_SIZE];
