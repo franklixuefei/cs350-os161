@@ -361,7 +361,7 @@ thread_fork(const char *name,
             //kprintf("as_copy failed in thread_fork, curthread_vmspace_addr: %p, newguy_vmspace_addr: %p\n", curthread->t_vmspace, newguy->t_vmspace);
             return res;
         }
-        //        as_activate(curthread->t_vmspace);
+        as_activate(curthread->t_vmspace); /* FIXME if wrong comment this out and retry */
         //copy vnodes
 //        spl = splhigh();
         for(i=3;i<MAX_OPENED_FILES;i++) {

@@ -20,7 +20,7 @@ alias a2test="cd ~/cs350-os161/os161-1.11/a2-test-scripts/; make runtests;cd -"
 #alias make runtests a3
 alias a3test="cd ~/cs350-os161/os161-1.11/a3-test-scripts/; make runtests;cd -"
 #alias run os
-alias runos="cd ~/cs350-os161/root/;sys161 kernel;cd-"
+alias runos="cd ~/cs350-os161/root/;sys161 kernel;cd -"
 #alias open kern.conf file
 alias confkern="cd ~/cs350-os161/os161-1.11/kern/conf;vim conf.kern"
 #alias open main.c file

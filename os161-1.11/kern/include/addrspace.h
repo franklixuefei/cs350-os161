@@ -5,9 +5,6 @@
 #include "opt-dumbvm.h"
 #include "opt-A3.h"
 
-#if OPT_A3   
-#include <array.h>
-#endif
 
 #if OPT_A3
 #define VM_STACKPAGES    12
@@ -43,7 +40,6 @@ struct addrspace {
 	size_t as_npages2;
 //	paddr_t as_pbase2;
 //	paddr_t as_stackpbase;
-
         struct vnode *elf_file_vnode;
         struct Pte **pt_code;
         struct Pte **pt_data;
@@ -111,5 +107,9 @@ int               as_define_stack(struct addrspace *as, vaddr_t *initstackptr);
 
 int load_elf(struct vnode *v, vaddr_t *entrypoint);
 
+#if OPT_A3   
 
+//extern struct addrspace* as_previous = NULL;
+
+#endif
 #endif /* _ADDRSPACE_H_ */

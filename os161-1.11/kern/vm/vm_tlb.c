@@ -13,6 +13,7 @@
 #include <kern/errno.h>
 #include <uw-vmstats.h>
 #include "pt.h"
+#include <elf.h>
 
 int
 tlb_get_rr_victim()
@@ -115,7 +116,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         if (res < 0) i = tlb_get_rr_victim();
         else i = res;
 
-        if (faultPte->flag & PTE_RDONLY) {
+        if (faultPte->flag & PF_R) {
             paddr |= TLBLO_VALID;
         }else{
             paddr |= TLBLO_VALID | TLBLO_DIRTY;

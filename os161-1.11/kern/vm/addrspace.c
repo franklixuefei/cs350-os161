@@ -8,12 +8,20 @@
 #include "pt.h"
 #include "opt-A3.h"
 #include <vnode.h>
+#include <uw-vmstats.h>
+#include <machine/spl.h>
+#include <machine/tlb.h>
 /*
  * Note! If OPT_DUMBVM is set, as is the case until you start the VM
  * assignment, this file is not compiled or linked or in any way
  * used. The cheesy hack versions in dumbvm.c are used instead.
  */
+#if OPT_A3   
 
+struct addrspace* as_previous = NULL;
+
+
+#endif
 struct addrspace * 
 as_create(char* programName)
 {
@@ -102,11 +110,24 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	 * Write this.
 	 */
 #if OPT_A3   
-
+        int i;
 	newas->as_vbase1 = old->as_vbase1;
 	newas->as_npages1 = old->as_npages1;
 	newas->as_vbase2 = old->as_vbase2;
 	newas->as_npages2 = old->as_npages2;
+        
+        memmove(newas->pt_code, old->pt_code);
+        for (i = 0; i < old->as_npages1; ++i) {
+            memmove(newas->pt_code[i], old->pt_code[i]);
+        } 
+        memmove(newas->pt_data, old->pt_data);
+        for (i = 0; i < old->as_npages2; ++i) {
+            memmove(newas->pt_data[i], old->pt_data[i]);
+        }
+        memmove(newas->pt_stack, old->pt_stack);
+        for (i = 0; i < VM_STACKPAGES; ++i) {
+            memmove(newas->pt_stack[i], old->pt_stack[i]);
+        }
 
 #else
 
@@ -123,11 +144,24 @@ as_activate(struct addrspace *as)
 	 * Write this.
 	 */
 #if OPT_A3     
+    if (as != as_previous) {
+    	int i, spl;
 
+	as_previous = as;
+        vmstats_inc(VMSTAT_TLB_INVALIDATE);
+	spl = splhigh();
 
+	for (i=0; i<NUM_TLB; i++) {
+		TLB_Write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
+	}
 
-#endif
+	splx(spl);
+    }
+
+#else
+
 	(void)as;  // suppress warning until code gets written
+#endif
 }
 
 /*
@@ -147,6 +181,10 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz,
 	/*
 	 * Write this.
 	 */
+#if OPT_A3   
+   /* make vaddr page-aligned */
+   vaddr &= PAGE_FRAME; 
+#else
 
 	(void)as;
 	(void)vaddr;
@@ -155,6 +193,7 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz,
 	(void)writeable;
 	(void)executable;
 	return EUNIMP;
+#endif
 }
 
 int
