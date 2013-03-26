@@ -30,7 +30,7 @@
 
 
 struct Pte {
-
+    short int valid;
     int32_t flag;
     paddr_t frameNum;
 };

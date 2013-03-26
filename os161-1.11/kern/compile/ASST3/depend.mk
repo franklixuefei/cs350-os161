@@ -130,8 +130,8 @@ addrspace.o: ../../vm/addrspace.c ../../include/types.h machine/types.h \
   ../../include/vm.h machine/vm.h opt-dumbvm.h opt-A3.h \
   ../../include/vfs.h ../../include/kern/unistd.h ../../include/pt.h \
   opt-A3.h ../../include/vnode.h ../../include/uw-vmstats.h machine/spl.h \
-  machine/tlb.h ../../include/thread.h opt-A2.h machine/pcb.h \
-  ../../include/curthread.h
+  machine/tlb.h ../../include/elf.h ../../include/thread.h opt-A2.h \
+  machine/pcb.h ../../include/curthread.h
 cache_mips1.o: ../../arch/mips/mips/cache_mips1.S machine/asmdefs.h
 exception.o: ../../arch/mips/mips/exception.S machine/asmdefs.h \
   machine/specialreg.h
@@ -478,7 +478,7 @@ vm_tlb.o: ../../vm/vm_tlb.c opt-A3.h ../../include/types.h \
   opt-A3.h machine/spl.h machine/tlb.h ../../include/curthread.h \
   ../../include/thread.h opt-A2.h machine/pcb.h machine/setjmp.h \
   ../../include/lib.h ../../include/kern/errno.h \
-  ../../include/uw-vmstats.h ../../include/pt.h
+  ../../include/uw-vmstats.h ../../include/pt.h ../../include/elf.h
 pt.o: ../../vm/pt.c opt-A3.h ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/kern/errno.h \
   ../../include/lib.h machine/setjmp.h ../../include/thread.h opt-A2.h \
