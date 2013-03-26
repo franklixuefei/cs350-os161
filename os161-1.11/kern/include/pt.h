@@ -15,6 +15,12 @@
  * =====================================================================================
  */
 
+#include "opt-A3.h"
+
+#if OPT_A3
+
+#include <types.h>
+
 #define PTE_RDONLY      0
 #define PTE_WRONLY      1
 
@@ -24,12 +30,16 @@
 
 
 struct Pte {
+
     int32_t flag;
-    int32_t frameNum;
+    paddr_t frameNum;
 };
 
+struct Pte * pte_create();
+void         pte_destroy(struct Pte* pte);
+int          probePte(vaddr_t vaddr, struct Pte **rPte);
 
-
+#endif
 
 
 

@@ -30,7 +30,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 {
 //	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
 	paddr_t paddr;
-	int i;
+	int i, res;
 	u_int32_t ehi, elo;
 	struct addrspace *as;
 	int spl;
@@ -97,28 +97,38 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		return EFAULT;
 	}
     
-     make sure it's page-aligned */
+        make sure it's page-aligned */
 
         struct Pte * faultPte = NULL;
         int errNum = -1;
-        errNum = probePte(faultaddress, faultPte);
+        errNum = probePte(faultaddress, &faultPte);
+        if (errNum) return errNum;
         paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);     
+        /* make sure it is page-aligned */
         assert((paddr & PAGE_FRAME)==paddr);
 
+        /* we need to first probe the TLB to ensure there is no dup ehi */
 
-       i = tlb_get_rr_victim();
+        res = TLB_Probe((u_int32_t)faultaddress, 0);
+
+        /* if probe fails, use round-robin algm */
+        if (res < 0) i = tlb_get_rr_victim();
+        else i = res;
+
         if (faultPte->flag & PTE_RDONLY) {
             paddr |= TLBLO_VALID;
         }else{
             paddr |= TLBLO_VALID | TLBLO_DIRTY;
         }
 
-       TLB_Read(&ehi, &elo, i);
-       if (elo & TLBLO_VALID) {
+       
+        TLB_Read(&ehi, &elo, i);
+       
+        if (elo & TLBLO_VALID) {
             vmstats_inc(VMSTAT_TLB_FAULT_REPLACE);
-       } else {   
+        } else {   
             vmstats_inc(VMSTAT_TLB_FAULT_FREE);
-       }
+        }
 
        
         DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);

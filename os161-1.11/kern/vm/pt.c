@@ -30,12 +30,25 @@
 #include <machine/spl.h>
 #include <machine/tlb.h>
 #include <addrspace.h>
-#include <pt.h>
 #include <uw-vmstats.h>
 #include <uio.h>
 #include <elf.h>
 #include <vnode.h>
+#include "pt.h"
 
+struct Pte *
+pte_create() 
+{
+    struct Pte * p;
+    p = kmalloc(sizeof(struct Pte)); 
+    return p;
+}
+
+void
+pte_destroy(struct Pte* pte)
+{
+    kfree(pte);
+}
 
 int
 calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
@@ -45,6 +58,7 @@ calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
 	assert(as->as_npages1 != 0);
 	assert(as->as_vbase2 != 0);
 	assert(as->as_npages2 != 0);
+        /* make sure they are aligned */
 	assert((as->as_vbase1 & PAGE_FRAME) == as->as_vbase1);
 	assert((as->as_vbase2 & PAGE_FRAME) == as->as_vbase2);
 
@@ -58,20 +72,20 @@ calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
 	stacktop = USERSTACK;
 
 	if (vaddr >= vbase1 && vaddr < vtop1) {
-            *rValue =PT_CODE;
+            *rValue = PT_CODE;
             return 0;
         }
 	else if (vaddr >= vbase2 && vaddr < vtop2) {
-            *rValue =PT_DATA;
+            *rValue = PT_DATA;
             return 0;
         
 	}
 	else if (vaddr >= stackbase && vaddr < stacktop) {
-             *rValue =PT_STACK;
+             *rValue = PT_STACK;
              return 0;
 	}
 	else {
-		return EFAULT;
+	    return EFAULT;
 	}
 
 
@@ -79,7 +93,7 @@ calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
 
     
 int
-probePte (vaddr_t vaddr , struct Pte *rPte) {
+probePte (vaddr_t vaddr , struct Pte **rPte) {
     struct addrspace *as;
     int segNum = -1;
     int errCode = -1;

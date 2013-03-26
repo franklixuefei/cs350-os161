@@ -6,6 +6,7 @@
 #include <vfs.h>
 #include <kern/unistd.h>
 #include "pt.h"
+#include "opt-A3.h"
 #include <vnode.h>
 /*
  * Note! If OPT_DUMBVM is set, as is the case until you start the VM
@@ -24,22 +25,26 @@ as_create(char* programName)
 	/*
 	 * Initialize as needed.
 	 */
+#if OPT_A3   
         char *copyProgramName = kstrdup(programName);
         vfs_open(copyProgramName, O_RDONLY, &(as->elf_file_vnode));
        // kfree(copyProgramName);
         as->progName = copyProgramName;
 
-        // This will be kmalloced in [as_define_region]
+        /* these will be kmalloc'ed in as_define_region and as_define_stack */
         as->pt_data = NULL;
         as->pt_code = NULL;
+        as->pt_stack = NULL;
+
         as->as_vbase1 = 0;
 	as->as_npages1 = 0;
 	as->as_vbase2 = 0;
 	as->as_npages2 = 0;
 
-        //
-        as->pt_stack = kmalloc(sizeof(struct Pte)*VM_STACKPAGES);
+        //This is known here so initialize it here.
+        //as->pt_stack = kmalloc(sizeof(struct Pte)*VM_STACKPAGES);
         
+#endif
 	return as;
 }
 
@@ -52,17 +57,32 @@ as_destroy(struct addrspace *as)
 	/*
 	 * Clean up as needed.
 	 */
-        if (as->pt_data != NULL) {
-            kfree(as->pt_data);
+#if OPT_A3   
+    int i;
+
+    for (i = 0; i < as->as_npages1; ++i) {
+        if (as->pt_code[i]) {
+            pte_destroy(as->pt_code[i]);
         }
-        if (as->pt_code != NULL) {
-            kfree(as->pt_code);
+    }
+    kfree(as->pt_code);
+    
+    for (i = 0; i < as->as_npages2; ++i) {
+        if (as->pt_data[i]) {
+            pte_destroy(as->pt_data[i]);
         }
-        if (as->pt_stack != NULL) {
-            kfree(as->pt_stack);
+    }
+    kfree(as->pt_data);
+
+    for (i = 0; i < VM_STACKPAGES; ++i) {
+        if (as->pt_stack[i]) {
+            pte_destroy(as->pt_stack[i]);
         }
-        kfree(as->progName);
-        vfs_close(as->elf_file_vnode);
+    }
+    kfree(as->pt_stack);
+
+
+#endif
 	kfree(as);
 }
 
@@ -81,9 +101,18 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	/*
 	 * Write this.
 	 */
+#if OPT_A3   
+
+	newas->as_vbase1 = old->as_vbase1;
+	newas->as_npages1 = old->as_npages1;
+	newas->as_vbase2 = old->as_vbase2;
+	newas->as_npages2 = old->as_npages2;
+
+#else
 
 	(void)old;
 	
+#endif
 	*ret = newas;
 	return 0;
 }
@@ -93,7 +122,11 @@ as_activate(struct addrspace *as)
 	/*
 	 * Write this.
 	 */
-        
+#if OPT_A3     
+
+
+
+#endif
 	(void)as;  // suppress warning until code gets written
 }
 

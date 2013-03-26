@@ -5,14 +5,13 @@
 #include "opt-dumbvm.h"
 #include "opt-A3.h"
 
-
-
 #if OPT_A3   
+#include <array.h>
+#endif
 
-
+#if OPT_A3
 #define VM_STACKPAGES    12
 #else
-
 #define DUMBVM_STACKPAGES    12
 #endif
 
@@ -36,7 +35,7 @@ struct addrspace {
 	paddr_t as_stackpbase;
 #else
 	/* Put stuff here for your VM system */
-        // ins
+#if OPT_A3    
         vaddr_t as_vbase1;
 	size_t as_npages1;
 //	paddr_t as_pbase1;
@@ -46,11 +45,12 @@ struct addrspace {
 //	paddr_t as_stackpbase;
 
         struct vnode *elf_file_vnode;
-        struct Pte *pt_code;
-        struct Pte *pt_data;
-        struct Pte *pt_stack;
+        struct Pte **pt_code;
+        struct Pte **pt_data;
+        struct Pte **pt_stack;
         char* progName;
 
+#endif
 #endif
 };
 
