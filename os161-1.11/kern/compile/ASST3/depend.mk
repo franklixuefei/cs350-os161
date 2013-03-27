@@ -130,8 +130,7 @@ addrspace.o: ../../vm/addrspace.c ../../include/types.h machine/types.h \
   ../../include/vm.h machine/vm.h opt-dumbvm.h opt-A3.h \
   ../../include/vfs.h ../../include/kern/unistd.h ../../include/pt.h \
   opt-A3.h ../../include/vnode.h ../../include/uw-vmstats.h machine/spl.h \
-  machine/tlb.h ../../include/elf.h ../../include/thread.h opt-A2.h \
-  machine/pcb.h ../../include/curthread.h
+  machine/tlb.h ../../include/elf.h
 cache_mips1.o: ../../arch/mips/mips/cache_mips1.S machine/asmdefs.h
 exception.o: ../../arch/mips/mips/exception.S machine/asmdefs.h \
   machine/specialreg.h

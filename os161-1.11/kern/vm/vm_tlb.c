@@ -31,12 +31,13 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 {
 //	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
 	paddr_t paddr;
-	int i, res;
+	int i, res, errNum;
 	u_int32_t ehi, elo;
 	struct addrspace *as;
-	int spl;
-    
-	spl = splhigh();
+	int spl; 
+        struct Pte * faultPte = NULL;
+	
+        spl = splhigh();
     
 	faultaddress &= PAGE_FRAME;
     
@@ -44,7 +45,22 @@ vm_fault(int faulttype, vaddr_t faultaddress)
     
 	switch (faulttype) {
             case VM_FAULT_READONLY:
-                return EFAULT;
+                /* if this is a readonly violation - check if the flag in pte contains writeable or not... */
+                errNum = probePte(faultaddress, &faultPte); // TODO probePte needs more detailed work.
+                if (errNum) {
+                    splx(spl);
+                    return errNum;
+                }
+                if (faultPte->flag & (PF_R | PF_W)) { /* ...if yes, then turn on the dirty bit for paddr and write back to TLB... */
+                    paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);  
+                    assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing
+                    paddr |= TLBLO_VALID | TLBLO_DIRTY;
+                    TLB_Read(&ehi, &elo, i);
+                    TLB_Write(faultaddress, paddr, i);
+                } else { /* ...if no, just gracefully terminate the process  */
+                    splx(spl);
+                    return EFAULT;
+                }
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
                 break;
@@ -63,50 +79,14 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		return EFAULT;
 	}
     
-	/* Assert that the address space has been set up properly.
-	assert(as->as_vbase1  != 0);
-	assert(as->as_pbase1 != 0);
-	assert(as->as_npages1 != 0);
-	assert(as->as_vbase2 != 0);
-	assert(as->as_pbase2 != 0);
-	assert(as->as_npages2 != 0);
-	assert(as->as_stackpbase != 0);
-	assert((as->as_vbase1 & PAGE_FRAME) == as->as_vbase1);
-	assert((as->as_pbase1 & PAGE_FRAME) == as->as_pbase1);
-	assert((as->as_vbase2 & PAGE_FRAME) == as->as_vbase2);
-	assert((as->as_pbase2 & PAGE_FRAME) == as->as_pbase2);
-	assert((as->as_stackpbase & PAGE_FRAME) == as->as_stackpbase);
-    
-	vbase1 = as->as_vbase1;
-	vtop1 = vbase1 + as->as_npages1 * PAGE_SIZE;
-	vbase2 = as->as_vbase2;
-	vtop2 = vbase2 + as->as_npages2 * PAGE_SIZE;
-	stackbase = USERSTACK - DUMBVM_STACKPAGES * PAGE_SIZE;
-	stacktop = USERSTACK;
-    
-	if (faultaddress >= vbase1 && faultaddress < vtop1) {
-		paddr = (faultaddress - vbase1) + as->as_pbase1;
-	}
-	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
-		paddr = (faultaddress - vbase2) + as->as_pbase2;
-	}
-	else if (faultaddress >= stackbase && faultaddress < stacktop) {
-		paddr = (faultaddress - stackbase) + as->as_stackpbase;
-	}
-	else {
-		splx(spl);
-		return EFAULT;
-	}
-    
-        make sure it's page-aligned */
-
-        struct Pte * faultPte = NULL;
-        int errNum = -1;
-        errNum = probePte(faultaddress, &faultPte);
-        if (errNum) return errNum;
+        errNum = probePte(faultaddress, &faultPte); // TODO probePte needs more detailed work.
+        if (errNum) {
+            splx(spl);
+            return errNum;
+        }
         paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);     
         /* make sure it is page-aligned */
-        assert((paddr & PAGE_FRAME)==paddr);
+        assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing
 
         /* we need to first probe the TLB to ensure there is no dup ehi */
 
@@ -116,10 +96,10 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         if (res < 0) i = tlb_get_rr_victim();
         else i = res;
 
-        if (faultPte->flag & PF_R) {
-            paddr |= TLBLO_VALID;
-        }else{
+        if (faultPte->flag & PF_W) {
             paddr |= TLBLO_VALID | TLBLO_DIRTY;
+        }else{
+            paddr |= TLBLO_VALID;
         }
 
        

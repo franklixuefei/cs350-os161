@@ -193,8 +193,12 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 	/*
 	 * Now actually load each segment.
 	 */
+        /* for A3, we need to implement ourself a segment loader in order to page on demand */
+#if OPT_A3   	
+        /* implemented in pt.c */
+#else
 
-	for (i=0; i<eh.e_phnum; i++) {
+        for (i=0; i<eh.e_phnum; i++) {
 		off_t offset = eh.e_phoff + i*eh.e_phentsize;
 		mk_kuio(&ku, &ph, sizeof(ph), offset, UIO_READ);
 
@@ -228,6 +232,7 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 		}
 	}
 
+#endif
 	result = as_complete_load(curthread->t_vmspace);
 	if (result) {
 		return result;

@@ -71,7 +71,7 @@ as_destroy(struct addrspace *as)
          *
          *
 	 */
-#if OPT_A3   
+#if OPT_A3
     unsigned int i;
 
     for (i = 0; i < as->as_npages1; ++i) {
@@ -198,18 +198,15 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz,
 
 	npages = sz / PAGE_SIZE;
 
-	/* We don't use these - all pages are read-write */
-	(void)readable;
-	(void)writeable;
-	(void)executable;
-
 	if (as->as_vbase1 == 0) {
 		as->as_vbase1 = vaddr;
 		as->as_npages1 = npages;
                 as->pt_code = kmalloc(sizeof(struct Pte *)*npages);
+                if (as->pt_code == NULL) return ENOMEM;
                 unsigned int i = 0;
                 for (i = 0; i < npages; i++) {
                     as->pt_code[i] = kmalloc(sizeof(struct Pte));
+                    if (!as->pt_code[i]) return ENOMEM;
                     as->pt_code[i]->flag = readable | writeable | executable;
                     as->pt_code[i]->valid = 0;
                 }
@@ -219,9 +216,11 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz,
 		as->as_vbase2 = vaddr;
 		as->as_npages2 = npages;
                 as->pt_data = kmalloc(sizeof(struct Pte *)*npages);
+                if (as->pt_data == NULL) return ENOMEM;
                 unsigned int i = 0;
                 for (i = 0; i < npages; i++) {
                     as->pt_data[i] = kmalloc(sizeof(struct Pte));
+                    if (!as->pt_data[i]) return ENOMEM;
                     as->pt_data[i]->flag = readable | writeable | executable;
                     as->pt_data[i]->valid = 0;
                 }
@@ -276,15 +275,15 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 
 #if OPT_A3   
 
-        if (as->as_vbase2 == 0) {
+        if (as->pt_stack == NULL) {
                 as->pt_stack = kmalloc(sizeof(struct Pte *)*VM_STACKPAGES);
-                int i = 0;
+                if (as->pt_stack == NULL) return ENOMEM;
+                int i;
                 for (i = 0; i < VM_STACKPAGES; i++) {
                     as->pt_stack[i] = kmalloc(sizeof(struct Pte));
                     as->pt_stack[i]->flag =  PF_R | PF_W;
                     as->pt_stack[i]->valid = 0;
                 }
-		return 0;
 	}
 #else
 
@@ -299,30 +298,14 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 
 
 
-
-
-// TODO dont forget to change me!!
-
-
-
-#include <types.h>
-#include <kern/errno.h>
-#include <lib.h>
-#include <thread.h>
-#include <curthread.h>
-#include <addrspace.h>
-#include <vm.h>
-#include <machine/spl.h>
-#include <machine/tlb.h>
-
-/*
+/*  
  * Dumb MIPS-only "VM system" that is intended to only be just barely
  * enough to struggle off the ground. You should replace all of this
  * code while doing the VM assignment. In fact, starting in that
  * assignment, this file is not included in your kernel!
- */
-
-/* under dumbvm, always have 48k of user stack */
+ 
+*/
+ //under dumbvm, always have 48k of user stack 
 
 
 static
@@ -343,11 +326,11 @@ getppages(unsigned long npages)
 void
 vm_bootstrap(void)
 {
-	/* Do nothing. */
+	 //Do nothing. 
 }
 
 
-/* Allocate/free some kernel-space virtual pages */
+// Allocate/free some kernel-space virtual pages 
 vaddr_t
 alloc_kpages(int npages)
 {
@@ -363,7 +346,7 @@ alloc_kpages(int npages)
 void
 free_kpages(vaddr_t addr)
 {
-	/* nothing */
+	 //nothing 
     
 	(void)addr;
 }
