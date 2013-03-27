@@ -51,15 +51,16 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     splx(spl);
                     return errNum;
                 }
-                if (faultPte->flag & (PF_R | PF_W)) { /* ...if yes, then turn on the dirty bit for paddr and write back to TLB... */
+                if ((faultPte->flag & PF_R) && (faultPte->flag & PF_W)) { /* ...if yes, then turn on the dirty bit for paddr and write back to TLB... */
                     paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);  
                     assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing
                     paddr |= TLBLO_VALID | TLBLO_DIRTY;
-                    TLB_Read(&ehi, &elo, i);
-                    TLB_Write(faultaddress, paddr, i);
+                    
+                    res = TLB_Probe((u_int32_t)faultaddress, 0);
+                    TLB_Write(faultaddress, paddr, res);
                 } else { /* ...if no, just gracefully terminate the process  */
                     splx(spl);
-                    return EFAULT;
+                    return EFAULT; /* TODO: maybe kill_curthread */
                 }
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
