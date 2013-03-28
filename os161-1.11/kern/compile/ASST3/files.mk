@@ -519,6 +519,11 @@ swapOps.o: ${S}/vm/swapOps.c
 SRCS+=${S}/vm/swapOps.c
 OBJS+=swapOps.o
 
+pt.o: ${S}/vm/pt.c
+	${COMPILE.c} ${S}/vm/pt.c
+SRCS+=${S}/vm/pt.c
+OBJS+=pt.o
+
 autoconf.o: ${S}/compile/ASST3/autoconf.c
 	${COMPILE.c} ${S}/compile/ASST3/autoconf.c
 SRCS+=${S}/compile/ASST3/autoconf.c
