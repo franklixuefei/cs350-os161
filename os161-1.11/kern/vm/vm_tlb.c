@@ -30,7 +30,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 {
 //	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
 	paddr_t paddr;
-	int i, res, errNum;
+	int i, res, errNum, hasPageFault = 0;
 	u_int32_t ehi, elo;
 	struct addrspace *as;
 	int spl; 
@@ -45,17 +45,20 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	switch (faulttype) {
             case VM_FAULT_READONLY:
                 /* if this is a readonly violation - check if the flag in pte contains writeable or not... */
-                errNum = probePte(faultaddress, &faultPte); // TODO probePte needs more detailed work.
+                errNum = probePte(faultaddress, &faultPte, &hasPageFault); // TODO probePte needs more detailed work.
                 if (errNum) {
                     splx(spl);
                     return errNum;
                 }
                 if ((faultPte->flag & PF_R) && (faultPte->flag & PF_W)) { /* ...if yes, then turn on the dirty bit for paddr and write back to TLB... */
+
+                    if (!hasPageFault) vmstats_inc(VMSTAT_TLB_RELOAD);
                     paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);  
                     assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing
                     paddr |= TLBLO_VALID | TLBLO_DIRTY;
-                    
+                    vmstats_inc(VMSTAT_TLB_FAULT);
                     res = TLB_Probe((u_int32_t)faultaddress, 0);
+                    vmstats_inc(VMSTAT_TLB_FAULT_REPLACE);
                     TLB_Write(faultaddress, paddr, res);
                 } else { /* ...if no, just gracefully terminate the process  */
                     splx(spl);
@@ -79,11 +82,14 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		return EFAULT;
 	}
     
-        errNum = probePte(faultaddress, &faultPte); // TODO probePte needs more detailed work.
+        errNum = probePte(faultaddress, &faultPte, &hasPageFault); // TODO probePte needs more detailed work.
         if (errNum) {
             splx(spl);
             return errNum;
         }
+
+        if (!hasPageFault) vmstats_inc(VMSTAT_TLB_RELOAD);
+        
         paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);     
         /* make sure it is page-aligned */
         assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing

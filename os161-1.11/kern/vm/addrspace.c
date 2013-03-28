@@ -1,4 +1,3 @@
-                //}
 #include <types.h>
 #include <kern/errno.h>
 #include <lib.h>
@@ -309,7 +308,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 */
  //under dumbvm, always have 48k of user stack 
 
-
+/*
 static
 paddr_t
 getppages(unsigned long npages)
@@ -321,32 +320,9 @@ getppages(unsigned long npages)
 	splx(spl);
 	return addr;
 }
-
-void
-vm_bootstrap(void)
-{
-	 //Do nothing. 
-}
+*/
 
 
-// Allocate/free some kernel-space virtual pages 
-vaddr_t
-alloc_kpages(int npages)
-{
-	paddr_t pa;
-	pa = getppages(npages);
-	if (pa==0) {
-		return 0;
-	}
-	return PADDR_TO_KVADDR(pa);
-}
 
 
-void
-free_kpages(vaddr_t addr)
-{
-	 //nothing 
-    
-	(void)addr;
-}
 

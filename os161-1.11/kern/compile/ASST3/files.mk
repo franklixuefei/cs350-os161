@@ -514,6 +514,11 @@ pt.o: ${S}/vm/pt.c
 SRCS+=${S}/vm/pt.c
 OBJS+=pt.o
 
+coremap.o: ${S}/vm/coremap.c
+	${COMPILE.c} ${S}/vm/coremap.c
+SRCS+=${S}/vm/coremap.c
+OBJS+=coremap.o
+
 autoconf.o: ${S}/compile/ASST3/autoconf.c
 	${COMPILE.c} ${S}/compile/ASST3/autoconf.c
 SRCS+=${S}/compile/ASST3/autoconf.c

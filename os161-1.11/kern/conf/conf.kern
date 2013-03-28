@@ -474,6 +474,7 @@ defoption A3
 defoption A4
     file   vm/vm_tlb.c
     file   vm/pt.c
+    file   vm/coremap.c
 
 #endif
 defoption A5

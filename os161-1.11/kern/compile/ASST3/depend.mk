@@ -484,7 +484,13 @@ pt.o: ../../vm/pt.c opt-A3.h ../../include/types.h machine/types.h \
   machine/pcb.h ../../include/curthread.h machine/spl.h machine/tlb.h \
   ../../include/addrspace.h ../../include/vm.h machine/vm.h opt-dumbvm.h \
   opt-A3.h ../../include/uw-vmstats.h ../../include/uio.h \
-  ../../include/elf.h ../../include/vnode.h ../../include/pt.h
+  ../../include/elf.h ../../include/vnode.h ../../include/pt.h \
+  ../../include/coremap.h
+coremap.o: ../../vm/coremap.c ../../include/coremap.h opt-A3.h \
+  ../../include/types.h machine/types.h ../../include/kern/types.h \
+  machine/ktypes.h machine/spl.h machine/tlb.h ../../include/kern/errno.h \
+  ../../include/lib.h machine/setjmp.h ../../include/addrspace.h \
+  ../../include/vm.h machine/vm.h opt-dumbvm.h ../../include/uw-vmstats.h
 autoconf.o: ../../compile/ASST3/autoconf.c ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/lib.h machine/setjmp.h ../../compile/ASST3/autoconf.h

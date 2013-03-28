@@ -113,7 +113,5 @@ int load_elf(struct vnode *v, vaddr_t *entrypoint);
 
 #if OPT_A3   
 
-//extern struct addrspace* as_previous = NULL;
-
 #endif
 #endif /* _ADDRSPACE_H_ */

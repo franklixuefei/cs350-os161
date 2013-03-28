@@ -11,12 +11,12 @@ struct coremap {
     paddr_t paddr;
     char occupied;    
     int length;
-}
+};
 
-paddr_t get1page(); 
 void vm_bootstrap(void);
 paddr_t vm_getppages(int npages);
 vaddr_t alloc_kpages(int npages);
+void free_kpages(vaddr_t addr);
 
 #endif
 

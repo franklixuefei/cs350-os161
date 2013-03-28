@@ -8,9 +8,9 @@
 #include <vm.h>
 #include <uw-vmstats.h>
 
-paddr_t start, end;
-int32_t num_entries;
-struct coremap* coremap_table;
+static paddr_t start, end;
+static int32_t num_entries;
+static struct coremap* coremap_table;
 
 void
 vm_bootstrap(void)
@@ -19,11 +19,11 @@ vm_bootstrap(void)
     ram_getsize(&start, &end);
     num_entries = (end - start) / (PAGE_SIZE+sizeof(struct coremap));
     coremap_table = (struct coremap*)PADDR_TO_KVADDR(start);
-    start += num_entires * sizeof(struct coremap);
+    start += num_entries * sizeof(struct coremap);
     // do we have to update the start paddr to an int?????
-    assert(start + num_entires * PAGE_SIZE == lastaddr);
+    assert(start + num_entries * PAGE_SIZE == end);
     u_int32_t i;
-    for (i = 0; i < num_entires; i++) {
+    for (i = 0; i < num_entries; i++) {
         coremap_table[i].occupied = 0;
         coremap_table[i].length = 0;
     }
@@ -42,9 +42,9 @@ vm_getppages(int npages)
     }
     u_int32_t i = 0;
     u_int32_t j, k;
-    while (i < num_entires) {
+    while (i < num_entries) {
         if (coremap_table[i].occupied == 0) {
-            for (j=0; j < num_entires && j < npages, j++) {
+            for (j=0; j < num_entries && j < npages; j++) {
                 if (coremap_table[i+j].occupied != 0) 
                     break;
             }
@@ -82,6 +82,12 @@ alloc_kpages(int npages)
     return PADDR_TO_KVADDR(pa);
 }
 
-paddr_t get1page() {
-
+void
+free_kpages(vaddr_t addr)
+{
+	 //nothing 
+    
+	(void)addr;
 }
+
+
