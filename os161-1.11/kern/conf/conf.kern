@@ -471,11 +471,10 @@ file	  userprog/execv.c
 # UW For A3 use the stats tracking code provided
 defoption A3
    file    vm/uw-vmstats.c
+   file    vm/vm_tlb.c
+   file    vm/coremap.c
+   file    vm/swapOps.c
 defoption A4
-    file   vm/vm_tlb.c
-    file   vm/pt.c
-    file   vm/coremap.c
-
 #endif
 defoption A5
 

@@ -23,6 +23,7 @@
 #if OPT_A3
 
 #include <types.h>
+#include <addrspace.h>
 
 #define PTE_RDONLY      0
 #define PTE_WRONLY      1
@@ -30,7 +31,6 @@
 #define PT_CODE      0
 #define PT_DATA      1
 #define PT_STACK      2
-
 
 struct Pte {
     short int valid;

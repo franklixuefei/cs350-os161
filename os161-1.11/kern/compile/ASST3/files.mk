@@ -509,15 +509,15 @@ vm_tlb.o: ${S}/vm/vm_tlb.c
 SRCS+=${S}/vm/vm_tlb.c
 OBJS+=vm_tlb.o
 
-pt.o: ${S}/vm/pt.c
-	${COMPILE.c} ${S}/vm/pt.c
-SRCS+=${S}/vm/pt.c
-OBJS+=pt.o
-
 coremap.o: ${S}/vm/coremap.c
 	${COMPILE.c} ${S}/vm/coremap.c
 SRCS+=${S}/vm/coremap.c
 OBJS+=coremap.o
+
+swapOps.o: ${S}/vm/swapOps.c
+	${COMPILE.c} ${S}/vm/swapOps.c
+SRCS+=${S}/vm/swapOps.c
+OBJS+=swapOps.o
 
 autoconf.o: ${S}/compile/ASST3/autoconf.c
 	${COMPILE.c} ${S}/compile/ASST3/autoconf.c

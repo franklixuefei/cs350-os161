@@ -121,6 +121,7 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	newas->as_npages1 = old->as_npages1;
 	newas->as_vbase2 = old->as_vbase2;
 	newas->as_npages2 = old->as_npages2;
+
         memmove(newas->pt_code, old->pt_code, old->as_npages1* sizeof(struct Pte *));
         /* FIXME*/
         for (i = 0; i < old->as_npages1; ++i) {
