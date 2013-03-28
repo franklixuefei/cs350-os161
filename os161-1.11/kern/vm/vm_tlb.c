@@ -19,7 +19,6 @@ int
 tlb_get_rr_victim()
 {
     int victim;
-    vmstats_inc(VMSTAT_TLB_FAULT);
     static unsigned int next_victim = 0;
     victim = next_victim;
     next_victim = (next_victim + 1) % NUM_TLB;
@@ -97,6 +96,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         if (res < 0) i = tlb_get_rr_victim();
         else i = res;
 
+        vmstats_inc(VMSTAT_TLB_FAULT);
+        
         if (faultPte->flag & PF_W) {
             paddr |= TLBLO_VALID | TLBLO_DIRTY;
         }else{

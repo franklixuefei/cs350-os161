@@ -1,3 +1,4 @@
+                //}
 #include <types.h>
 #include <kern/errno.h>
 #include <lib.h>
@@ -315,11 +316,8 @@ getppages(unsigned long npages)
 {
 	int spl;
 	paddr_t addr;
-    
 	spl = splhigh();
-    
 	addr = ram_stealmem(npages);
-	
 	splx(spl);
 	return addr;
 }

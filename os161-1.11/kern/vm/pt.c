@@ -35,6 +35,7 @@
 #include <elf.h>
 #include <vnode.h>
 #include "pt.h"
+#include "coremap.h"
 
 struct Pte *
 pte_create() 
@@ -58,7 +59,7 @@ calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
 	assert(as->as_npages1 != 0);
 	assert(as->as_vbase2 != 0);
 	assert(as->as_npages2 != 0);
-        /* make sure they are aligned */
+        /* make sure they are page-aligned */
 	assert((as->as_vbase1 & PAGE_FRAME) == as->as_vbase1);
 	assert((as->as_vbase2 & PAGE_FRAME) == as->as_vbase2);
         
@@ -68,7 +69,7 @@ calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
 	vtop2 = vbase2 + as->as_npages2 * PAGE_SIZE;
 	stackbase = USERSTACK - VM_STACKPAGES * PAGE_SIZE;
 	stacktop = USERSTACK;
-
+    
 	if (vaddr >= vbase1 && vaddr < vtop1) {
             *rValue = PT_CODE;
             return 0;
@@ -90,7 +91,8 @@ calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
 
     
 int
-probePte (vaddr_t vaddr , struct Pte **rPte) {
+probePte (vaddr_t vaddr , struct Pte **rPte) 
+{
     struct addrspace *as;
     int segNum = -1;
     int errCode = -1;
@@ -120,29 +122,28 @@ probePte (vaddr_t vaddr , struct Pte **rPte) {
     }
 
     if (rPte->valid == 0) {
-        res = pageFaultHandler();
-        if (res) {
-            return res;
+        if (segNum == PT_STACK) {
+            res = pageFaultHandler(vaddr, LOAD_FROM_STACK, rPte, segNum);
+        } else {
+            res = pageFaultHandler(vaddr, LOAD_FROM_ELF, rPte, segNum);
         }
-    } else if (rPte->flag & PF_R) { 
-        res = pageFaultHandler();
+        if (res) return res;
+    } else if (rPte->flag & PF_R == 0) { 
+        res = pageFaultHandler(vaddr, LOAD_FROM_SWAP, rPte, segNum);
         if (res) {
             return res;
         }
     } else {
-        return 0;
+        /* Do nothing */
     }
-
-
     return 0;
 }
 
 
 int
-insertPte (vaddr_t vaddr, paddr_t paddr, int segNum) 
+insertPte (vaddr_t vaddr, paddr_t paddr, int segNum, struct Pte **pte) /* report inserted pte back to pte */
 {
     struct addrspace *as;
-    struct Pte *pte;
     int err;
 
     as = curthread->t_vmspace;
@@ -151,53 +152,96 @@ insertPte (vaddr_t vaddr, paddr_t paddr, int segNum)
     }
     switch(segNum) {
         case PT_CODE:
-            pte = as->pt_code[(vaddr - as->as_vbase1)/PAGE_SIZE]; 
+            *pte = as->pt_code[(vaddr - as->as_vbase1)/PAGE_SIZE]; 
             break;
         case PT_DATA:
-            pte = as->pt_data[(vaddr - as->as_vbase2)/PAGE_SIZE];
+            *pte = as->pt_data[(vaddr - as->as_vbase2)/PAGE_SIZE];
             break;
         case PT_STACK:
-            pte = as->pt_stack(USERSTACK - vaddr)/PAGE_SIZE];
+            *pte = as->pt_stack(USERSTACK - vaddr)/PAGE_SIZE];
             break;
         default:
             return EFAULT;
     }
-    if (pte == NULL) {
+    if (*pte == NULL) {
          return EFAULT;
     }
-    pte->valid = 1;
-    pte->frameNum = paddr & PAGE_FRAME;
+    (*pte)->valid = 1;
+    (*pte)->frameNum = paddr & PAGE_FRAME; // TODO need revision
     return 0;
 }
 
 int 
-pageFaultHandler (vaddr_t vaddr, int faulttype, paddr_t *paddr, int segNum)
+pageFaultHandler(vaddr_t vaddr, int faulttype, struct Pte **pte, int segNum)
 {
-    int res;
+    int res = 0;
     switch(faulttype) {
-        case IN_ELF:
-
-            res = loadPageFromElf(vaddr, paddr, segNum);
+        case LOAD_FROM_ELF:
+            vmstats_inc(VMSTAT_PAGE_FAULT_DISK);
+            vmstats_inc(VMSTAT_ELF_FILE_READ);
+            res = loadPageFromElf(vaddr, pte, segNum);
             break;
-        case IN_SWAP:
-
+        case LOAD_FROM_SWAP:
+            vmstats_inc(VMSTAT_PAGE_FAULT_DISK);
+            vmstats_inc(VMSTAT_SWAP_FILE_READ);
+            //res = loadPageFromSwap();
+            break;
+        case LOAD_FROM_STACK:
+            vmstats_inc(VMSTAT_PAGE_FAULT_ZERO);
+            res = allocZeroedPage(vaddr, pte, segNum);
             break;
         default:
-
-   }
+            return EINVAL;
+    }
+    if (res) return res;
+    return 0;
 }
 
 int
-loadPageFromElf(vaddr_t vaddr, paddr_t *paddr, int segNum)
+allocZeroedPage(vaddr_t vaddr, struct Pte** pte, int segNum) // refer to load_segment
 {
+    struct uio u;
+    int result;
+    paddr_t paddr;
+
+    u.uio_iovec.iov_ubase = (userptr_t)vaddr;
+    u.uio_iovec.iov_len = PAGE_SIZE; // length of the memory space
+    u.uio_resid = PAGE_SIZE; // amount to actually read
+    u.uio_offset = 0;
+    u.uio_segflg = UIO_USERISPACE;
+    u.uio_rw = UIO_READ;
+    u.uio_space = curthread->t_vmspace;
+    
+    result = uiomovezeros(PAGE_SIZE, &u);
+
+    if (result) return result;
+    
+    paddr = get1page();
+    
+    /* Now, insert page table entry */
+    
+    result = insertPte(vaddr, paddr, segNum, pte);
+    if (result) return result;
+
+    /* Now, give control back to vm_fault for updating TLB */
+    
+    return 0;
+    
+}
+
+int
+loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
+{ 
         Elf_Ehdr eh;   /* Executable header */
 	Elf_Phdr ph;   /* "Program header" = segment header */
 	int result, i, pageOffset, vbase1, vbase2, remainingPage;
 	struct uio ku;
+        paddr_t paddr;
     
 	/*
 	 * Read the executable header from offset 0 in the file.
 	 */
+        paddr = get1page();
 
 	mk_kuio(&ku, &eh, sizeof(eh), 0, UIO_READ);
 	result = VOP_READ(v, &ku);
@@ -224,6 +268,8 @@ loadPageFromElf(vaddr_t vaddr, paddr_t *paddr, int segNum)
 		return ENOEXEC;
 	}
 
+
+
         for (i=0; i<eh.e_phnum; i++) {
 		off_t offset = eh.e_phoff + i*eh.e_phentsize;
 		mk_kuio(&ku, &ph, sizeof(ph), offset, UIO_READ);
@@ -244,22 +290,20 @@ loadPageFromElf(vaddr_t vaddr, paddr_t *paddr, int segNum)
 		    case PT_PHDR: /* skip */ continue;
 		    case PT_MIPS_REGINFO: /* skip */ continue;
 		    case PT_LOAD: 
-                        {
-                            vbase1 = curthread->t_vmspace->as_vbase1;
-                            vbase2 = curthread->t_vmspace->as_vbase2;
-                            switch(segNum) {
-                                case PT_CODE:
-                                    pageOffset = ph.p_offset + (vaddr - vbase1);
-                                    break;
-                                case PT_DATA:
-                                    pageOffset = ph.p_offset + (vaddr - vbase2);
-                                    break;
-                                case PT_STACK:
-                                    return EFAULT;
-                                    break;
-                                default:
-                                    return EFAULT;
-                            }
+                        vbase1 = curthread->t_vmspace->as_vbase1;
+                        vbase2 = curthread->t_vmspace->as_vbase2;
+                        switch(segNum) {
+                            case PT_CODE:
+                                pageOffset = ph.p_offset + (vaddr - vbase1);
+                                break;
+                            case PT_DATA:
+                                pageOffset = ph.p_offset + (vaddr - vbase2);
+                                break;
+                            case PT_STACK:
+                                return EFAULT;
+                                break;
+                            default:
+                                return EFAULT;
                         }
                         break;
 		    default:
@@ -267,17 +311,17 @@ loadPageFromElf(vaddr_t vaddr, paddr_t *paddr, int segNum)
 				ph.p_type);
 			return ENOEXEC;
 		}
-                if (ph.p_filesz - (pageOffset - ph.p_offset) > PAGE_SIZE) { 
-                    result = load_segment(curthread->t_vmspace->elf_file_vnode, ph.p_offset, ph.p_vaddr, PAGE_SIZE, PAGE_SIZE,ph.p_flags & PF_X);
-                } else {
-                    remainingPage = ph.p_filesz - (pageOffset - ph.p_offset);
-                    result = load_segment(curthread->t_vmspace->elf_file_vnode, ph.p_offset, ph.p_vaddr, PAGE_SIZE, remainingPage, ph.p_flags & PF_X);
-
-                }
+                result = load_segment(curthread->t_vmspace->elf_file_vnode, pageOffset, vaddr, PAGE_SIZE, PAGE_SIZE,ph.p_flags & PF_X);
                	if (result) {
 			return result;
 		}
+                /* Now, insert page table entry */
+                result = insertPte(vaddr, paddr, segNum, pte);
+                if (result) return result;
+                
+                /* Now, give control back to vm_fault for updating TLB */
 	}
+        
 }
 
 

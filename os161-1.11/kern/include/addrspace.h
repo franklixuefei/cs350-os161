@@ -8,8 +8,9 @@
 
 #if OPT_A3
 #define VM_STACKPAGES    12
-#define IN_SWAP   1
-#define IN_ELF   2
+#define LOAD_FROM_SWAP   1
+#define LOAD_FROM_ELF    2
+#define LOAD_FROM_STACK  4
 #else
 #define DUMBVM_STACKPAGES    12
 #endif
