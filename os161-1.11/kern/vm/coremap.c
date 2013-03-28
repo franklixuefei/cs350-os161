@@ -15,13 +15,16 @@ static struct coremap* coremap_table;
 void
 vm_bootstrap(void)
 {
-    vmstats_init();
+    //vmstats_init();
     ram_getsize(&start, &end);
+    assert((start&PAGE_FRAME)==start);
+    assert((end&PAGE_FRAME)==end);
     num_entries = (end - start) / (PAGE_SIZE+sizeof(struct coremap));
+    int remainder = (end - start) % (PAGE_SIZE+sizeof(struct coremap));
     coremap_table = (struct coremap*)PADDR_TO_KVADDR(start);
     start += num_entries * sizeof(struct coremap);
     // do we have to update the start paddr to an int?????
-    assert(start + num_entries * PAGE_SIZE == end);
+    assert(start + num_entries * PAGE_SIZE+remainder == end);
     u_int32_t i;
     for (i = 0; i < num_entries; i++) {
         coremap_table[i].occupied = 0;
@@ -31,9 +34,18 @@ vm_bootstrap(void)
 }
 
 paddr_t
+getppages(unsigned long npages)
+{
+	int spl;
+	paddr_t addr;
+	spl = splhigh();
+	addr = coremap_table? vm_getppages(npages) : ram_stealmem(npages);
+	splx(spl);
+	return addr;
+}
+paddr_t
 vm_getppages(int npages)
 {
-    //lock or diabling interrupt here???
     u_int32_t paddr = 0;
     u_int32_t size = npages * PAGE_SIZE;
     
@@ -75,7 +87,7 @@ vaddr_t
 alloc_kpages(int npages)
 {
     paddr_t pa;
-    pa = vm_getppages(npages);
+    pa = getppages(npages);
     if (pa == 0) {
         return 0; // not sure!!!!!
     }

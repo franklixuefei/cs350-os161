@@ -215,7 +215,7 @@ allocZeroedPage(vaddr_t vaddr, struct Pte** pte, int segNum) // refer to load_se
 
     if (result) return result;
     
-    paddr = vm_getppages(1);
+    paddr = getppages(1);
     
     /* Now, insert page table entry */
     
@@ -241,7 +241,7 @@ loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
 	 * Read the executable header from offset 0 in the file.
 	 */
 
-        paddr = vm_getppages(1);
+        paddr = getppages(1);
 	
         mk_kuio(&ku, &eh, sizeof(eh), 0, UIO_READ);
 	result = VOP_READ(v, &ku);
