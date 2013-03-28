@@ -200,9 +200,11 @@ int
 allocZeroedPage(vaddr_t vaddr, struct Pte** pte, int segNum) // refer to load_segment
 {
     struct uio u;
-    int result;
+    int result, i;
     paddr_t paddr;
 
+    
+    u_int32_t ehi, elo;
     u.uio_iovec.iov_ubase = (userptr_t)vaddr;
     u.uio_iovec.iov_len = PAGE_SIZE; // length of the memory space
     u.uio_resid = PAGE_SIZE; // amount to actually read
@@ -221,9 +223,27 @@ allocZeroedPage(vaddr_t vaddr, struct Pte** pte, int segNum) // refer to load_se
     result = insertPte(vaddr, paddr, segNum, pte);
     if (result) return result;
 
-    result = uiomovezeros(PAGE_SIZE, &u);
-    /* Now, give control back to vm_fault for updating TLB */
+    /* updating TLB */
+
+    i = tlb_get_rr_victim();
     
+    vmstats_inc(VMSTAT_TLB_FAULT);
+
+    paddr |= TLBLO_VALID | TLBLO_DIRTY;
+
+    TLB_Read(&ehi, &elo, i);
+       
+    if (elo & TLBLO_VALID) {
+        vmstats_inc(VMSTAT_TLB_FAULT_REPLACE);
+    } else {   
+        vmstats_inc(VMSTAT_TLB_FAULT_FREE);
+    }
+
+    
+    TLB_Write(vaddr, paddr, i);
+    
+    result = uiomovezeros(PAGE_SIZE, &u);
+    if (result) return result;
     return 0;
     
 }
@@ -231,6 +251,7 @@ allocZeroedPage(vaddr_t vaddr, struct Pte** pte, int segNum) // refer to load_se
 int
 loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
 { 
+        u_int32_t ehi, elo;
         Elf_Ehdr eh;   /* Executable header */
 	Elf_Phdr ph;   /* "Program header" = segment header */
 	int result, i, pageOffset, vbase1, vbase2;
@@ -319,7 +340,29 @@ loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
                 result = insertPte(vaddr, paddr, segNum, pte);
                 if (result) return result;
                 
-                /* Now, give control back to vm_fault for updating TLB */
+                /* updating TLB */
+
+                i = tlb_get_rr_victim();
+     
+                vmstats_inc(VMSTAT_TLB_FAULT);
+                
+                if ((*pte)->flag & PF_W) {
+                    paddr |= TLBLO_VALID | TLBLO_DIRTY;
+                }else{
+                    paddr |= TLBLO_VALID;
+                }
+
+                TLB_Read(&ehi, &elo, i);
+       
+                if (elo & TLBLO_VALID) {
+                    vmstats_inc(VMSTAT_TLB_FAULT_REPLACE);
+                } else {   
+                    vmstats_inc(VMSTAT_TLB_FAULT_FREE);
+                }
+
+    
+                TLB_Write(vaddr, paddr, i);
+
 	}
         return 0;
 }

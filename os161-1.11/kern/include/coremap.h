@@ -15,6 +15,7 @@ struct coremap {
 
 void vm_bootstrap(void);
 paddr_t vm_getppages(int npages);
+paddr_t getppages(unsigned long npages);
 vaddr_t alloc_kpages(int npages);
 void free_kpages(vaddr_t addr);
 

@@ -112,6 +112,6 @@ int load_elf(struct vnode *v, vaddr_t *entrypoint);
 
 
 #if OPT_A3   
-
+int tlb_get_rr_victim();
 #endif
 #endif /* _ADDRSPACE_H_ */
