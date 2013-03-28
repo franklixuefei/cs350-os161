@@ -115,7 +115,7 @@ probePte (vaddr_t vaddr , struct Pte **rPte, int* hasPageFault)
             *rPte = as->pt_data[(vaddr - as->as_vbase2)/PAGE_SIZE];
             break;
         case PT_STACK:
-            *rPte = as->pt_stack[(USERSTACK - vaddr)/PAGE_SIZE];
+            *rPte = as->pt_stack[(USERSTACK - vaddr)/PAGE_SIZE -1];
             break;
         default:
             return EFAULT;
@@ -157,7 +157,7 @@ insertPte (vaddr_t vaddr, paddr_t paddr, int segNum, struct Pte **pte) /* report
             *pte = as->pt_data[(vaddr - as->as_vbase2)/PAGE_SIZE];
             break;
         case PT_STACK:
-            *pte = as->pt_stack[(USERSTACK - vaddr)/PAGE_SIZE];
+            *pte = as->pt_stack[(USERSTACK - vaddr)/PAGE_SIZE - 1];
             break;
         default:
             return EFAULT;
@@ -207,11 +207,10 @@ allocZeroedPage(vaddr_t vaddr, struct Pte** pte, int segNum) // refer to load_se
     u.uio_iovec.iov_len = PAGE_SIZE; // length of the memory space
     u.uio_resid = PAGE_SIZE; // amount to actually read
     u.uio_offset = 0;
-    u.uio_segflg = UIO_USERISPACE;
+    u.uio_segflg = UIO_USERSPACE;
     u.uio_rw = UIO_READ;
     u.uio_space = curthread->t_vmspace;
     
-    result = uiomovezeros(PAGE_SIZE, &u);
 
     if (result) return result;
     
@@ -222,6 +221,7 @@ allocZeroedPage(vaddr_t vaddr, struct Pte** pte, int segNum) // refer to load_se
     result = insertPte(vaddr, paddr, segNum, pte);
     if (result) return result;
 
+    result = uiomovezeros(PAGE_SIZE, &u);
     /* Now, give control back to vm_fault for updating TLB */
     
     return 0;
