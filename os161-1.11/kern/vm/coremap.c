@@ -15,6 +15,7 @@ static struct coremap* coremap_table;
 void
 vm_bootstrap(void)
 {
+#if abc
     //vmstats_init();
     ram_getsize(&start, &end);
     assert((start&PAGE_FRAME)==start);
@@ -30,7 +31,7 @@ vm_bootstrap(void)
         coremap_table[i].occupied = 0;
         coremap_table[i].length = 0;
     }
-    
+#endif
 }
 
 paddr_t
@@ -39,7 +40,8 @@ getppages(unsigned long npages)
 	int spl;
 	paddr_t addr;
 	spl = splhigh();
-	addr = coremap_table? vm_getppages(npages) : ram_stealmem(npages);
+	addr = ram_stealmem(npages);
+	//addr = coremap_table? vm_getppages(npages) : ram_stealmem(npages);
 	splx(spl);
 	return addr;
 }

@@ -1,64 +1,68 @@
 RUNNING ./run-batch-A3 : Version 1.0
 ---------------------------------------------------------------
 ************** RUNNING [test-vm-basic] TESTS ******************
-sys161: Cannot open boot image kernel: No such file or directory
+
+
+CS350-036's system version 036 (ASST3 #12)
+
+
+OS/161 kernel: p uw-testbin/vm-stack1
+Running program uw-testbin/vm-stack1 failed: Unimplemented feature
+Operation took 0.933207537 seconds
+OS/161 kernel: q
+Shutting down.
+VMSTATS:
+VMSTAT                TLB Faults =          0
+VMSTAT      TLB Faults with Free =          0
+VMSTAT   TLB Faults with Replace =          0
+VMSTAT         TLB Invalidations =          0
+VMSTAT               TLB Reloads =          0
+VMSTAT      Page Faults (Zeroed) =          0
+VMSTAT        Page Faults (Disk) =          0
+VMSTAT      Page Faults from ELF =          0
+VMSTAT Page Faults from Swapfile =          0
+VMSTAT           Swapfile Writes =          0
+VMSTAT TLB Faults with Free + TLB Faults with Replace = 0
+VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 0
+VMSTAT ELF File reads + Swapfile reads = 0
+The system is halted.
+sys161: 27860645 cycles (4862995 run, 22997650 global-idle)
+sys161:   cpu0: 4862995 kern, 0 user, 0 idle)
+sys161: 1447 irqs 0 exns 0r/0w disk 0r/1366w console 3r/0w/3m emufs 0r/0w net
+sys161: Elapsed real time: 0.983489 seconds (28.3284 mhz)
+sys161: Elapsed virtual time: 1.114425817 seconds (25 mhz)
 -----------
-sys161: Cannot open boot image kernel: No such file or directory
+
+
+CS350-036's system version 036 (ASST3 #12)
+
+
+OS/161 kernel: p uw-testbin/vm-stack2
+Running program uw-testbin/vm-stack2 failed: Unimplemented feature
+Operation took 0.933196137 seconds
+OS/161 kernel: q
+Shutting down.
+VMSTATS:
+VMSTAT                TLB Faults =          0
+VMSTAT      TLB Faults with Free =          0
+VMSTAT   TLB Faults with Replace =          0
+VMSTAT         TLB Invalidations =          0
+VMSTAT               TLB Reloads =          0
+VMSTAT      Page Faults (Zeroed) =          0
+VMSTAT        Page Faults (Disk) =          0
+VMSTAT      Page Faults from ELF =          0
+VMSTAT Page Faults from Swapfile =          0
+VMSTAT           Swapfile Writes =          0
+VMSTAT TLB Faults with Free + TLB Faults with Replace = 0
+VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 0
+VMSTAT ELF File reads + Swapfile reads = 0
+The system is halted.
+sys161: 27858952 cycles (4861648 run, 22997304 global-idle)
+sys161:   cpu0: 4861648 kern, 0 user, 0 idle)
+sys161: 1446 irqs 0 exns 0r/0w disk 0r/1366w console 3r/0w/3m emufs 0r/0w net
+sys161: Elapsed real time: 1.130697 seconds (24.6387 mhz)
+sys161: Elapsed virtual time: 1.114358097 seconds (25 mhz)
 -----------
 
 ---------------------------------------------------------------
 ************** RUNNING [test-vm-replace] TESTS ******************
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-
----------------------------------------------------------------
-************** RUNNING [test-vm-crash] TESTS ******************
-sys161: Cannot open boot image kernel: No such file or directory
------------------------------------------
-sys161: Cannot open boot image kernel: No such file or directory
------------------------------------------
-
----------------------------------------------------------------
-************** RUNNING [test-vm-big-no-fork] TESTS ******************
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------------------------------------
-
----------------------------------------------------------------
-************** RUNNING [test-vm-consecutive] TESTS ******************
-Test vm-consecutive
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------------------------------------
-
----------------------------------------------------------------
-************** RUNNING [test-vm-paging] TESTS ******************
------------------------------------------
-sys161: Cannot open boot image kernel: No such file or directory
------------------------------------------
-sys161: Cannot open boot image kernel: No such file or directory
------------------------------------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-sys161: Cannot open boot image kernel: No such file or directory
------------
-

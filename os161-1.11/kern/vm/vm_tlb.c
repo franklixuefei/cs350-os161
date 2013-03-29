@@ -53,6 +53,10 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                 if ((faultPte->flag & PF_R) && (faultPte->flag & PF_W)) { /* ...if yes, then turn on the dirty bit for paddr and write back to TLB... */
 
                     if (!hasPageFault) vmstats_inc(VMSTAT_TLB_RELOAD);
+                    else {
+                        splx(spl);
+                        return 0;
+                    }
                     paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);  
                     assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing
                     paddr |= TLBLO_VALID | TLBLO_DIRTY;
@@ -89,7 +93,10 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         }
 
         if (!hasPageFault) vmstats_inc(VMSTAT_TLB_RELOAD);
-        
+        else {
+            splx(spl);
+            return 0;
+        }
         paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);     
         /* make sure it is page-aligned */
         assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing

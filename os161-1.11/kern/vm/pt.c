@@ -262,7 +262,6 @@ loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
 	 * Read the executable header from offset 0 in the file.
 	 */
 
-        paddr = getppages(1);
 	
         mk_kuio(&ku, &eh, sizeof(eh), 0, UIO_READ);
 	result = VOP_READ(v, &ku);
@@ -276,6 +275,8 @@ loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
 		return ENOEXEC;
 	}
 
+        paddr = getppages(1);
+        
         if (eh.e_ident[EI_MAG0] != ELFMAG0 ||
 	    eh.e_ident[EI_MAG1] != ELFMAG1 ||
 	    eh.e_ident[EI_MAG2] != ELFMAG2 ||
@@ -322,7 +323,6 @@ loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
                                 break;
                             case PT_STACK:
                                 return EFAULT;
-                                break;
                             default:
                                 return EFAULT;
                         }
@@ -331,10 +331,6 @@ loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
 			kprintf("loadelf: unknown segment type %d\n", 
 				ph.p_type);
 			return ENOEXEC;
-		}
-                result = load_segment(curthread->t_vmspace->elf_file_vnode, pageOffset, vaddr, PAGE_SIZE, PAGE_SIZE,ph.p_flags & PF_X);
-               	if (result) {
-			return result;
 		}
                 /* Now, insert page table entry */
                 result = insertPte(vaddr, paddr, segNum, pte);
@@ -362,6 +358,11 @@ loadPageFromElf(vaddr_t vaddr, struct Pte** pte, int segNum)
 
     
                 TLB_Write(vaddr, paddr, i);
+
+                result = load_segment(curthread->t_vmspace->elf_file_vnode, pageOffset, vaddr, PAGE_SIZE, PAGE_SIZE,ph.p_flags & PF_X);
+               	if (result) {
+			return result;
+		}
 
 	}
         return 0;
