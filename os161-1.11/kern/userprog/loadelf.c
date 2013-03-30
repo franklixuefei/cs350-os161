@@ -42,6 +42,7 @@ load_segment(struct vnode *v, off_t offset, vaddr_t vaddr,
 	size_t fillamt;
 
 	if (filesize > memsize) {
+                    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
 		kprintf("ELF: warning: segment filesize > segment memsize\n");
 		filesize = memsize;
 	}
@@ -61,13 +62,14 @@ load_segment(struct vnode *v, off_t offset, vaddr_t vaddr,
 	if (result) {
 		return result;
 	}
-
+#if abc
 	if (u.uio_resid != 0) {
 		/* short read; problem with executable? */
+                    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
 		kprintf("ELF: short read on segment - file truncated?\n");
 		return ENOEXEC;
 	}
-
+#endif
 	/* Fill the rest of the memory space (if any) with zeros */
 	fillamt = memsize - filesize;
 	if (fillamt > 0) {

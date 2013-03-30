@@ -15,23 +15,34 @@ static struct coremap* coremap_table;
 void
 vm_bootstrap(void)
 {
-#if abc
     //vmstats_init();
-    ram_getsize(&start, &end);
+//    ram_getsize(&start, &end);
+    assert(coremap_table == NULL);
     assert((start&PAGE_FRAME)==start);
     assert((end&PAGE_FRAME)==end);
+    /*
     num_entries = (end - start) / (PAGE_SIZE+sizeof(struct coremap));
     int remainder = (end - start) % (PAGE_SIZE+sizeof(struct coremap));
     coremap_table = (struct coremap*)PADDR_TO_KVADDR(start);
     start += num_entries * sizeof(struct coremap);
     // do we have to update the start paddr to an int?????
     assert(start + num_entries * PAGE_SIZE+remainder == end);
+    */
+    u_int32_t ramsize = mips_ramsize();
+    num_entries = ramsize/PAGE_SIZE;
     u_int32_t i;
+
+    coremap_table = (struct coremap*)kmalloc(num_entries*sizeof(struct coremap));
+
+    ram_getsize(&start, &end);
+
+    num_entries = (end-start)/PAGE_SIZE;
+
+
     for (i = 0; i < num_entries; i++) {
         coremap_table[i].occupied = 0;
         coremap_table[i].length = 0;
     }
-#endif
 }
 
 paddr_t
@@ -40,8 +51,8 @@ getppages(unsigned long npages)
 	int spl;
 	paddr_t addr;
 	spl = splhigh();
-	addr = ram_stealmem(npages);
-	//addr = coremap_table? vm_getppages(npages) : ram_stealmem(npages);
+//	addr = ram_stealmem(npages);
+	addr = coremap_table? vm_getppages(npages) : ram_stealmem(npages);
 	splx(spl);
 	return addr;
 }

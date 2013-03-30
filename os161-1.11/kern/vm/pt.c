@@ -308,6 +308,7 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
 
 		if (ku.uio_resid != 0) {
 			/* short read; problem with executable? */
+                    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
 			kprintf("ELF: short read on phdr - file truncated?\n");
 			return ENOEXEC;
 		}
@@ -321,14 +322,14 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
                         vbase2 = curthread->t_vmspace->as_vbase2;
                         if (ph.p_vaddr == vbase1) {
                             if (segNum == PT_CODE) {
-                                baseOffset = vaddr - vbase1;
+                                offset = vaddr - vbase1 + ph.p_offset;
                                 break;
                             } else {
                                 continue;
                             }
                         } else if (ph.p_vaddr == vbase2) {
                             if (segNum == PT_DATA) {
-                                baseOffset = vaddr - vbase2;
+                                offset = vaddr - vbase2 + ph.p_offset;
                                 break;
                             } else {
                                 continue;
@@ -336,6 +337,8 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
 
                         } 
 		    default:
+
+                    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
 			kprintf("loadelf: unknown segment type %d\n", 
 				ph.p_type);
 			return ENOEXEC;
@@ -368,10 +371,10 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
                 TLB_Write(vaddr, paddr | TLBLO_VALID | TLBLO_DIRTY, j);
                 
                 /* load data from ELF file and construct code and data segments */
-                if (ph.p_filesz - baseOffset >= PAGE_SIZE){
-                    result = load_segment(curthread->t_vmspace->elf_file_vnode, ph.p_offset + baseOffset, vaddr, PAGE_SIZE, PAGE_SIZE,ph.p_flags & PF_X);
+                if (ph.p_filesz - offset + ph.p_offset > PAGE_SIZE){
+                    result = load_segment(curthread->t_vmspace->elf_file_vnode, offset, vaddr, PAGE_SIZE, PAGE_SIZE,ph.p_flags & PF_X);
                 }else{
-                    result = load_segment(curthread->t_vmspace->elf_file_vnode, ph.p_offset + baseOffset, vaddr, PAGE_SIZE, ph.p_filesz - baseOffset, ph.p_flags & PF_X);
+                    result = load_segment(curthread->t_vmspace->elf_file_vnode, offset, vaddr, PAGE_SIZE, ph.p_filesz - offset + ph.p_offset, ph.p_flags & PF_X);
                 }
                	if (result) {
 			return result;

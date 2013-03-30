@@ -97,7 +97,7 @@ as_destroy(struct addrspace *as)
 
     vfs_close(as->elf_file_vnode);
     kfree(as->progName);
-
+    as_previous = NULL;
 #endif
 	kfree(as);
 }
