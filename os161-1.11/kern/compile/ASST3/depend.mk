@@ -318,7 +318,8 @@ main.o: ../../main/main.c ../../include/types.h machine/types.h \
   ../../include/scheduler.h ../../include/dev.h ../../include/vfs.h \
   ../../include/vm.h machine/vm.h ../../include/syscall.h \
   machine/trapframe.h ../../include/version.h opt-A0.h opt-A3.h \
-  ../../include/uw-vmstats.h opt-A3.h
+  ../../include/swapfile.h ../../include/addrspace.h opt-dumbvm.h \
+  opt-A3.h ../../include/uw-vmstats.h
 menu.o: ../../main/menu.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/kern/errno.h \
   ../../include/kern/unistd.h ../../include/kern/limits.h \
@@ -482,8 +483,10 @@ coremap.o: ../../vm/coremap.c ../../include/coremap.h opt-A3.h \
   ../../include/types.h machine/types.h ../../include/kern/types.h \
   machine/ktypes.h machine/spl.h machine/tlb.h ../../include/kern/errno.h \
   ../../include/lib.h machine/setjmp.h ../../include/addrspace.h \
-  ../../include/vm.h machine/vm.h opt-dumbvm.h ../../include/uw-vmstats.h
-swapOps.o: ../../vm/swapOps.c ../../include/swapOps.h \
+  ../../include/vm.h machine/vm.h opt-dumbvm.h ../../include/uw-vmstats.h \
+  ../../include/thread.h opt-A2.h machine/pcb.h ../../include/curthread.h \
+  ../../include/swapfile.h
+swapfile.o: ../../vm/swapfile.c ../../include/swapfile.h \
   ../../include/types.h machine/types.h ../../include/kern/types.h \
   machine/ktypes.h ../../include/addrspace.h ../../include/vm.h \
   machine/vm.h opt-dumbvm.h opt-A3.h ../../include/synch.h opt-A1.h \
@@ -498,7 +501,7 @@ pt.o: ../../vm/pt.c opt-A3.h ../../include/types.h machine/types.h \
   ../../include/addrspace.h ../../include/vm.h machine/vm.h opt-dumbvm.h \
   opt-A3.h ../../include/uw-vmstats.h ../../include/uio.h \
   ../../include/elf.h ../../include/vnode.h ../../include/pt.h \
-  ../../include/coremap.h
+  ../../include/coremap.h ../../include/swapfile.h
 autoconf.o: ../../compile/ASST3/autoconf.c ../../include/types.h \
   machine/types.h ../../include/kern/types.h machine/ktypes.h \
   ../../include/lib.h machine/setjmp.h ../../compile/ASST3/autoconf.h

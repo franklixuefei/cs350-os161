@@ -36,6 +36,7 @@
 #include <vnode.h>
 #include "pt.h"
 #include "coremap.h"
+#include "swapfile.h"
 
 struct Pte *
 pte_create() 
@@ -53,7 +54,6 @@ pte_destroy(struct Pte* pte)
 
 int
 calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
-
 	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
         assert(as->as_vbase1 != 0);
 	assert(as->as_npages1 != 0);
@@ -84,7 +84,6 @@ calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue){
 	    return EFAULT;
 	}
         return 0;
-
 }
 
     
@@ -138,6 +137,47 @@ probePte (vaddr_t vaddr , struct Pte **rPte, int* hasPageFault)
 }
 
 
+// Will turn off readable bit for the vaddr entry in pagetables
+int
+disableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte */
+{
+    struct addrspace* addrSpace = (struct addrspace*)addrS;
+    if (addrSpace == NULL) {
+        return EFAULT;
+    }
+    int errCode = -1;
+    int segNum = 0;
+    struct Pte* pte = NULL;
+    errCode = calculate_segment(addrSpace, vaddr, &segNum);
+    if (errCode) {
+        return errCode;
+    }
+
+    
+    switch(segNum) {
+        case PT_CODE:
+            pte = addrSpace->pt_code[(vaddr - addrSpace->as_vbase1)/PAGE_SIZE]; 
+            break;
+        case PT_DATA:
+            pte = addrSpace->pt_data[(vaddr - addrSpace->as_vbase2)/PAGE_SIZE];
+            break;
+        case PT_STACK:
+            pte = addrSpace->pt_stack[(USERSTACK - vaddr)/PAGE_SIZE - 1];
+            break;
+        default:
+            return EFAULT;
+    }
+    if (pte == NULL) {
+         return EFAULT;
+    }
+   // this will disable the readable bit in the pte entry 
+    assert(pte->valid == 1);
+    pte->flag &= ~PF_R;
+    return 0;
+}
+
+
+
 int
 insertPte (vaddr_t vaddr, paddr_t paddr, int segNum, struct Pte *pte) /* report inserted pte back to pte */
 {
@@ -183,7 +223,7 @@ pageFaultHandler(vaddr_t vaddr, int faulttype, struct Pte *pte, int segNum)
         case LOAD_FROM_SWAP:
             vmstats_inc(VMSTAT_PAGE_FAULT_DISK);
             vmstats_inc(VMSTAT_SWAP_FILE_READ);
-            //res = loadPageFromSwap();
+            res = swapIn(vaddr, curthread->t_vmspace);
             break;
         case LOAD_FROM_STACK:
             vmstats_inc(VMSTAT_PAGE_FAULT_ZERO);
@@ -213,7 +253,7 @@ allocZeroedPage(vaddr_t vaddr, struct Pte* pte, int segNum) // refer to load_seg
     u.uio_rw = UIO_READ;
     u.uio_space = curthread->t_vmspace;
     
-    paddr = getppages(1);
+    paddr = getppages(1, vaddr);
     
     /* Now, insert page table entry */
     
@@ -280,7 +320,7 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
 		return ENOEXEC;
 	}
 
-        paddr = getppages(1);
+        paddr = getppages(1,vaddr);
         
         if (eh.e_ident[EI_MAG0] != ELFMAG0 ||
 	    eh.e_ident[EI_MAG1] != ELFMAG1 ||

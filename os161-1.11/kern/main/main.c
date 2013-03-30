@@ -20,7 +20,7 @@
 #include "opt-A0.h"
 #include "opt-A3.h"
 #if OPT_A3   
-
+#include "swapfile.h"
 #include "uw-vmstats.h"
 
 #endif
@@ -88,7 +88,6 @@ boot(void)
 	vfs_bootstrap();
 	dev_bootstrap();
 #if OPT_A3   
-
         vmstats_init();
 
 #endif

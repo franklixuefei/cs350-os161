@@ -514,10 +514,10 @@ coremap.o: ${S}/vm/coremap.c
 SRCS+=${S}/vm/coremap.c
 OBJS+=coremap.o
 
-swapOps.o: ${S}/vm/swapOps.c
-	${COMPILE.c} ${S}/vm/swapOps.c
-SRCS+=${S}/vm/swapOps.c
-OBJS+=swapOps.o
+swapfile.o: ${S}/vm/swapfile.c
+	${COMPILE.c} ${S}/vm/swapfile.c
+SRCS+=${S}/vm/swapfile.c
+OBJS+=swapfile.o
 
 pt.o: ${S}/vm/pt.c
 	${COMPILE.c} ${S}/vm/pt.c
