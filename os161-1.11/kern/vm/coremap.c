@@ -48,9 +48,6 @@ vm_bootstrap(void)
         coremap_table[i].t_pid = 0;
         coremap_table[i].addrSpace = NULL;
     }
-    int res;
-    res = initSwapOps ();
-    if (res) panic("initSwapOps error: %d\n", res);
 }
 
 int

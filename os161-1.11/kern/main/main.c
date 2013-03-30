@@ -96,7 +96,11 @@ boot(void)
 
 	/* Default bootfs - but ignore failure, in case emu0 doesn't exist */
 	vfs_setbootfs("emu0");
+#if OPT_A3   
 
+        initSwapOps();
+
+#endif
 
 	/*
 	 * Make sure various things aren't screwed up.
