@@ -207,13 +207,15 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
     }
     swapLookupTable[lastOffset].addr = targetAddr;
     swapLookupTable[lastOffset].offset = lastOffset;
-    lastOffset++;
+    swapLookupTable[lastOffset].belongToAddrsapce = addrSpace;
+
 
     mk_kuio(&copyUIO, (void*)targetAddr, PAGE_SIZE, lastOffset*PAGE_SIZE, UIO_WRITE);
     copyUIO.uio_space = targetAddrs;
     copyUIO.uio_segflg = (inIns) ? UIO_USERISPACE : UIO_USERSPACE;
     result = VOP_WRITE(swapFile, &copyUIO);
 
+    lastOffset++;
     disableReadForPte (targetAddr, targetAddrs);
     lock_release(swapFileLookupLock);
     lock_release(swapFileLock);

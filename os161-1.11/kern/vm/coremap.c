@@ -55,11 +55,14 @@ page_get_rr_victim()
 {
     int victim;
     static unsigned int next_page_victim = 0;
-    while(coremap_table[next_page_victim].addrSpace == NULL || coremap_table[next_page_victim].occupied == 0) {
-        next_page_victim = (next_page_victim + 1) % num_entries;
+    if (next_page_victim == 0) {
+    // 0x8badf00d will indicate these pages belongs to kernel and shouldnt be swapped
+        while(coremap_table[next_page_victim].addrSpace == NULL || coremap_table[next_page_victim].occupied == 0 || coremap_table[next_page_victim].vaddr == 0x8badf00d ) {
+            next_page_victim = (next_page_victim + 1) % num_entries;
+        }
     }
     victim = next_page_victim;
-    while(coremap_table[next_page_victim].addrSpace == NULL || coremap_table[next_page_victim].occupied == 0) {
+    while(coremap_table[next_page_victim].addrSpace == NULL || coremap_table[next_page_victim].occupied == 0 || coremap_table[next_page_victim].vaddr == 0x8badf00d ) {
         next_page_victim = (next_page_victim + 1) % num_entries;
     }
     return victim;
@@ -79,6 +82,10 @@ paddr_t getppages(unsigned long npages, vaddr_t vaddr)
 }
 paddr_t vm_getppages(int npages, vaddr_t vaddr)
 {
+
+    if (npages > num_entries) {
+        return 0;
+    }
     u_int32_t paddr = 0;
     u_int32_t size = npages * PAGE_SIZE;
     
@@ -99,7 +106,12 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
                     coremap_table[i+k].occupied = 1;
                     coremap_table[i+k].length = npages-k;
                     coremap_table[i+k].t_pid = curthread->pid; 
-                    coremap_table[i+k].vaddr = vaddr+k*PAGE_SIZE;
+    // 0x8badf00d will indicate these pages belongs to kernel and shouldnt be swapped
+                    if (vaddr != 0x8badf00d) {
+                        coremap_table[i+k].vaddr = vaddr+k*PAGE_SIZE;
+                    }else{
+                        coremap_table[i+k].vaddr = vaddr;
+                    }
                     coremap_table[i+k].addrSpace = (void*)curthread->t_vmspace;
                     kprintf("addr: %p\n", coremap_table[i+k].addrSpace);
                 }
@@ -121,7 +133,9 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
         if (result) {
             return result;
         }
-
+        coremap_table[targetPage].occupied = 0;
+        
+        return vm_getppages(npages, paddr);
         //do page replacement here!!!!!
     }
     return paddr;
@@ -131,7 +145,8 @@ vaddr_t
 alloc_kpages(int npages)
 {
     paddr_t pa;
-    pa = getppages(npages, 0);
+    // 0x8badf00d will indicate these pages belongs to kernel and shouldnt be swapped
+    pa = getppages(npages, 0x8badf00d);
     if (pa == 0) {
         return 0; // not sure!!!!!
     }
