@@ -64,6 +64,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     res = TLB_Probe((u_int32_t)faultaddress, 0);
                     vmstats_inc(VMSTAT_TLB_FAULT_REPLACE);
                     TLB_Write(faultaddress, paddr, res);
+                    return 0;
                 } else { /* ...if no, just gracefully terminate the process  */
                     splx(spl);
                     return EFAULT; /* TODO: maybe kill_curthread */
