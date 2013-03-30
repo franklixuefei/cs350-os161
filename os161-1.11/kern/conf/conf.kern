@@ -476,6 +476,5 @@ defoption A3
    file    vm/swapOps.c
    file    vm/pt.c
 defoption A4
-#endif
 defoption A5
 

@@ -227,7 +227,7 @@ allocZeroedPage(vaddr_t vaddr, struct Pte* pte, int segNum) // refer to load_seg
     res = TLB_Probe((u_int32_t)vaddr, 0);
     if (res >= 0) {
         i = res;
-    }else{
+    } else {
         i = tlb_get_rr_victim();
     }
     

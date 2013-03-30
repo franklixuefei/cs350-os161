@@ -95,6 +95,8 @@ as_destroy(struct addrspace *as)
     }
     kfree(as->pt_stack);
 
+    vfs_close(as->elf_file_vnode);
+    kfree(as->progName);
 
 #endif
 	kfree(as);
@@ -297,33 +299,6 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 	
 	return 0;
 }
-
-
-
-/*  
- * Dumb MIPS-only "VM system" that is intended to only be just barely
- * enough to struggle off the ground. You should replace all of this
- * code while doing the VM assignment. In fact, starting in that
- * assignment, this file is not included in your kernel!
- 
-*/
- //under dumbvm, always have 48k of user stack 
-
-/*
-static
-paddr_t
-getppages(unsigned long npages)
-{
-	int spl;
-	paddr_t addr;
-	spl = splhigh();
-	addr = ram_stealmem(npages);
-	splx(spl);
-	return addr;
-}
-*/
-
-
 
 
 
