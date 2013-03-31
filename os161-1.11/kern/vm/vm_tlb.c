@@ -25,9 +25,26 @@ tlb_get_rr_victim()
     return victim;
 }
 
+void
+dumpTLB()
+{
+    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
+    int i =0;
+    for (i = 0; i < NUM_TLB ; i++) {
+        u_int32_t ehi, elo;
+        TLB_Read(&ehi, &elo, i);
+        kprintf ("[%d]\t%p\t%p\n",i , ehi, elo);
+    }
+    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
+    
+}
+
+
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
+    assert(faultaddress != 0);
+        dumpTLB();
 //	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
 	paddr_t paddr;
 	int i, res, errNum, hasPageFault = 0;
@@ -54,10 +71,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                 if ((faultPte->flag & PF_R) && (faultPte->flag & PF_W)) { /* ...if yes, then turn on the dirty bit for paddr and write back to TLB... */
 
                     if (!hasPageFault) vmstats_inc(VMSTAT_TLB_RELOAD);
+                    /*
                     else {
                         splx(spl);
                         return 0;
                     }
+                    */
                     paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);  
                     assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing
                     paddr |= TLBLO_VALID | TLBLO_DIRTY;
@@ -98,10 +117,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         }
 
         if (!hasPageFault) vmstats_inc(VMSTAT_TLB_RELOAD);
+        /*
         else {
             splx(spl);
             return 0;
         }
+        */
         paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);     
         /* make sure it is page-aligned */
         assert((paddr & PAGE_FRAME)==paddr); // TODO need reviewing

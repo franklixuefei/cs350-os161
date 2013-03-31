@@ -137,9 +137,9 @@ probePte (vaddr_t vaddr , struct Pte **rPte, int* hasPageFault)
 }
 
 
-// Will turn off readable bit for the vaddr entry in pagetables
+// Will turn on readable bit for the vaddr entry in pagetables
 int
-disableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte */
+enableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte */
 {
     struct addrspace* addrSpace = (struct addrspace*)addrS;
     if (addrSpace == NULL) {
@@ -172,7 +172,55 @@ disableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte
     }
    // this will disable the readable bit in the pte entry 
     assert(pte->valid == 1);
+    pte->flag |= PF_R;
+    return 0;
+}
+
+
+// Will turn off readable bit for the vaddr entry in pagetables
+int
+disableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte */
+{
+    struct addrspace* addrSpace = (struct addrspace*)addrS;
+    if (addrSpace == NULL) {
+        return EFAULT;
+    }
+    int errCode = -1;
+    int segNum = 0;
+    struct Pte* pte = NULL;
+    int res = 0;
+    errCode = calculate_segment(addrSpace, vaddr, &segNum);
+    if (errCode) {
+        return errCode;
+    }
+
+    
+    switch(segNum) {
+        case PT_CODE:
+            pte = addrSpace->pt_code[(vaddr - addrSpace->as_vbase1)/PAGE_SIZE]; 
+            break;
+        case PT_DATA:
+            pte = addrSpace->pt_data[(vaddr - addrSpace->as_vbase2)/PAGE_SIZE];
+            break;
+        case PT_STACK:
+            pte = addrSpace->pt_stack[(USERSTACK - vaddr)/PAGE_SIZE - 1];
+            break;
+        default:
+            return EFAULT;
+    }
+    if (pte == NULL) {
+         return EFAULT;
+    }
+   // this will disable the readable bit in the pte entry 
+    assert(pte->valid == 1);
     pte->flag &= ~PF_R;
+    
+
+
+
+    res = TLB_Probe((u_int32_t)vaddr, 0);
+    assert(res>=0);
+    TLB_Write(TLBHI_INVALID(res), TLBLO_INVALID(), res);
     return 0;
 }
 
@@ -348,7 +396,7 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
 
 		if (ku.uio_resid != 0) {
 			/* short read; problem with executable? */
-                    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
+                        kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
 			kprintf("ELF: short read on phdr - file truncated?\n");
 			return ENOEXEC;
 		}
@@ -378,7 +426,7 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
                         } 
 		    default:
 
-                    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
+                        kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
 			kprintf("loadelf: unknown segment type %d\n", 
 				ph.p_type);
 			return ENOEXEC;

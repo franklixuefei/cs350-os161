@@ -489,10 +489,11 @@ coremap.o: ../../vm/coremap.c ../../include/coremap.h opt-A3.h \
 swapfile.o: ../../vm/swapfile.c ../../include/swapfile.h \
   ../../include/types.h machine/types.h ../../include/kern/types.h \
   machine/ktypes.h ../../include/addrspace.h ../../include/vm.h \
-  machine/vm.h opt-dumbvm.h opt-A3.h ../../include/synch.h opt-A1.h \
-  ../../include/queue.h ../../include/pt.h ../../include/kern/errno.h \
-  ../../include/thread.h opt-A2.h machine/pcb.h machine/setjmp.h \
-  ../../include/uio.h ../../include/vnode.h ../../include/coremap.h \
+  machine/vm.h opt-dumbvm.h opt-A3.h machine/tlb.h ../../include/synch.h \
+  opt-A1.h ../../include/queue.h ../../include/pt.h \
+  ../../include/kern/errno.h ../../include/thread.h opt-A2.h \
+  machine/pcb.h machine/setjmp.h ../../include/uio.h \
+  ../../include/vnode.h ../../include/coremap.h \
   ../../include/kern/unistd.h ../../include/lib.h ../../include/vfs.h
 pt.o: ../../vm/pt.c opt-A3.h ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/kern/errno.h \

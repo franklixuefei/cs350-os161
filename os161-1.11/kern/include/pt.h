@@ -46,6 +46,8 @@ int          allocZeroedPage(vaddr_t vaddr, struct Pte *pte, int segNum);
 int          calculate_segment(struct addrspace *as, vaddr_t vaddr, int* rValue);
 int          loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum);
 int          load_segment(struct vnode *v, off_t offset, vaddr_t vaddr, size_t memsize, size_t filesize, int is_executable);
+
+int calculate_segment (struct addrspace *as, vaddr_t vaddr, int* rValue);
 #endif
 #endif /* _PT_H_ */
 

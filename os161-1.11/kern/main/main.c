@@ -131,7 +131,12 @@ shutdown(void)
 
 
 	splhigh();
+#if OPT_A3   
 
+    vm_shutdown();
+    shutdownSwapOps();
+
+#endif
 	scheduler_shutdown();
 	thread_shutdown();
 }

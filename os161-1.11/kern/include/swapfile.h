@@ -35,4 +35,11 @@ struct swapTransaction{
 };
 
 */
+
+
+
+int initSwapOps ();
+void shutdownSwapOps ();
+int swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs);
+int swapOut (vaddr_t targetAddr, struct addrspace* addrSpace);
 #endif

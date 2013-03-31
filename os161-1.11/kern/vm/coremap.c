@@ -15,6 +15,20 @@ static paddr_t start, end;
 static int32_t num_entries;
 struct coremap* coremap_table;
 
+
+void
+dumpCoreMap()
+{
+    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
+    int i =0;
+    for (i = 0; i < num_entries; i++) {
+        if (coremap_table[i].occupied == 1) {
+            kprintf("entry[%d]:\t %p \t %p \t %p\n", i, coremap_table[i].vaddr, coremap_table[i].addrSpace, coremap_table[i].paddr);
+        }
+    }
+}
+
+
 void
 vm_bootstrap(void)
 {
@@ -50,21 +64,27 @@ vm_bootstrap(void)
     }
 }
 
+
+void
+vm_shutdown()
+{
+    kfree(coremap_table);
+}
+
 int
 page_get_rr_victim()
 {
     int victim;
     static unsigned int next_page_victim = 0;
-    if (next_page_victim == 0) {
     // 0x8badf00d will indicate these pages belongs to kernel and shouldnt be swapped
-        while(coremap_table[next_page_victim].addrSpace == NULL || coremap_table[next_page_victim].occupied == 0 || coremap_table[next_page_victim].vaddr == 0x8badf00d ) {
-            next_page_victim = (next_page_victim + 1) % num_entries;
-        }
-    }
-    victim = next_page_victim;
-    while(coremap_table[next_page_victim].addrSpace == NULL || coremap_table[next_page_victim].occupied == 0 || coremap_table[next_page_victim].vaddr == 0x8badf00d ) {
+    while(coremap_table[next_page_victim].addrSpace == NULL || 
+            coremap_table[next_page_victim].occupied == 0 || 
+            coremap_table[next_page_victim].vaddr == 0x8badf00d ) {
+
         next_page_victim = (next_page_victim + 1) % num_entries;
     }
+    victim = next_page_victim;
+    next_page_victim = (next_page_victim + 1) % num_entries;
     return victim;
 }
 
@@ -83,6 +103,7 @@ paddr_t getppages(unsigned long npages, vaddr_t vaddr)
 paddr_t vm_getppages(int npages, vaddr_t vaddr)
 {
 
+    static unsigned int nextSearchIndex = 0;
     if (npages > num_entries) {
         return 0;
     }
@@ -112,6 +133,7 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
                     }else{
                         coremap_table[i+k].vaddr = vaddr;
                     }
+                    coremap_table[i+k].paddr = paddr;
                     coremap_table[i+k].addrSpace = (void*)curthread->t_vmspace;
                     kprintf("addr: %p\n", coremap_table[i+k].addrSpace);
                 }
@@ -134,8 +156,12 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
             return result;
         }
         coremap_table[targetPage].occupied = 0;
+        coremap_table[targetPage].vaddr =  0;
+        coremap_table[targetPage].addrSpace = 0;
         
-        return vm_getppages(npages, paddr);
+        dumpCoreMap();
+        //return coremap_table[targetPage].paddr;
+        return vm_getppages(npages, vaddr);
         //do page replacement here!!!!!
     }
     return paddr;
