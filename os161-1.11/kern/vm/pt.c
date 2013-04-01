@@ -172,6 +172,7 @@ enableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte 
     }
    // this will disable the readable bit in the pte entry 
     assert(pte->valid == 1);
+    assert((pte->flag&PF_R)==0); // FIXME
     pte->flag |= PF_R;
     return 0;
 }
@@ -213,6 +214,7 @@ disableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte
     }
    // this will disable the readable bit in the pte entry 
     assert(pte->valid == 1);
+    assert(pte->flag&PF_R); // FIXME
     pte->flag &= ~PF_R;
     
 

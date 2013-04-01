@@ -94,7 +94,7 @@ as_destroy(struct addrspace *as)
         }
     }
     kfree(as->pt_stack);
-
+    coremap_free((void *)as);
     vfs_close(as->elf_file_vnode);
     kfree(as->progName);
     as_previous = NULL;

@@ -31,6 +31,7 @@
 #include <addrspace.h>
 #include <lib.h>
 #include <vfs.h>
+#include <uw-vmstats.h>
 
 
 
@@ -121,6 +122,7 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     assert(targetAddrs != NULL);
     assert(targetAddr != 0);
 
+    u_int32_t ehi, elo;
     struct uio copyUIO; 
     int inIns =0, result;
     /*
@@ -173,8 +175,8 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     /* updating TLB */
     paddr_t swap_paddr;
     swap_res = TLB_Probe((u_int32_t)targetAddr, 0);
-
-    if (swap_res < 0) {
+    assert(swap_res < 0);
+    //if (swap_res < 0) {
         //TODO: may need to added status info 
         swap_j = tlb_get_rr_victim();
         lock_release(swapFileLookupLock);
@@ -182,9 +184,17 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
         swap_paddr = getppages(1, targetAddr);
         lock_acquire(swapFileLock);
         lock_acquire(swapFileLookupLock);
+        vmstats_inc(VMSTAT_TLB_FAULT);
+         TLB_Read(&ehi, &elo, swap_j);
+       
+        if (elo & TLBLO_VALID) {
+            vmstats_inc(VMSTAT_TLB_FAULT_REPLACE);
+        } else {   
+            vmstats_inc(VMSTAT_TLB_FAULT_FREE);
+        }
 
         TLB_Write(targetAddr, swap_paddr | TLBLO_VALID | TLBLO_DIRTY, swap_j);
-    }
+    //}
 
 
 
@@ -226,6 +236,7 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
 int
 swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
 {
+    vmstats_inc(VMSTAT_SWAP_FILE_WRITE);
     assert(addrSpace != NULL);
     assert(targetAddr != 0);
     struct uio copyUIO; 
@@ -316,4 +327,16 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
     return 0;
 }
 
+void
+swapTableFree(struct addrspace* addrs)
+{
+   int i = 0;
+   for (i = 0; i < SWAP_ENTRY_COUNT; i++) {
+       if (swapLookupTable[i].belongToAddrsapce == addrs) {
+           swapLookupTable[i].addr = 0;
+           swapLookupTable[i].offset = -1;
+           swapLookupTable[i].belongToAddrsapce = NULL;
+       }
+   }
+}
 

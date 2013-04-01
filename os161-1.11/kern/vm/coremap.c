@@ -205,4 +205,20 @@ free_kpages(vaddr_t addr)
 	(void)addr;
 }
 
-
+void
+coremap_free(void* addrs)
+{
+    struct addrspace* addrSpace = (struct addrspace *)addrs;
+    int i;
+    for (i = 0; i < num_entries; ++i) {
+        if (coremap_table[i].addrSpace == addrSpace && coremap_table[i].vaddr != 0x8badf00d) {
+            coremap_table[i].vaddr = 0;
+            coremap_table[i].paddr = 0;
+            coremap_table[i].occupied = 0;
+            coremap_table[i].length = -1;
+            coremap_table[i].t_pid = 0;
+            coremap_table[i].addrSpace = NULL;
+        }
+    }
+    swapTableFree(addrSpace);
+}
