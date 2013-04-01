@@ -29,6 +29,23 @@ dumpCoreMap()
 }
 
 
+int
+updateCoreMap(paddr_t paddr, vaddr_t vaddr, void* addrSpace)
+{
+    struct addrspace *addrs = (struct addrspace* )addrSpace;
+    int i =0;
+    for (i = 0; i < num_entries; i++) {
+        if (coremap_table[i].occupied == 0) {
+            coremap_table[i].addrSpace = addrs;
+            coremap_table[i].paddr = paddr;
+            coremap_table[i].vaddr = vaddr;
+            coremap_table[i].occupied = 1;
+            return 0;
+        }
+    }
+    return -1;
+}
+
 void
 vm_bootstrap(void)
 {
@@ -135,7 +152,7 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
                     }
                     coremap_table[i+k].paddr = paddr;
                     coremap_table[i+k].addrSpace = (void*)curthread->t_vmspace;
-                    kprintf("addr: %p\n", coremap_table[i+k].addrSpace);
+//                    kprintf("addr: %p\n", coremap_table[i+k].addrSpace);
                 }
                 break;
             }
@@ -148,7 +165,7 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
         }
     }
     if (paddr == 0) {
-        kprintf("out of memory!\n");
+//        kprintf("out of memory!\n");
         
         int targetPage = page_get_rr_victim();
         int result = swapOut(coremap_table[targetPage].vaddr, (struct addrspace*)(coremap_table[targetPage].addrSpace));
@@ -159,7 +176,8 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
         coremap_table[targetPage].vaddr =  0;
         coremap_table[targetPage].addrSpace = 0;
         
-        dumpCoreMap();
+        //dumpCoreMap();
+        //dumpCoreMap();
         //return coremap_table[targetPage].paddr;
         return vm_getppages(npages, vaddr);
         //do page replacement here!!!!!

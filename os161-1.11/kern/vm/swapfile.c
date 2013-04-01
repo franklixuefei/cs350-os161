@@ -147,13 +147,14 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     int foundTatgetIndex = -1;
     int i = 0;
     for (i = 0; i < SWAP_ENTRY_COUNT ; i++) {
-        if (swapLookupTable[i].belongToAddrsapce == targetAddrs) {
+        if (swapLookupTable[i].belongToAddrsapce == targetAddrs && swapLookupTable[i].addr == targetAddr) {
             foundTatgetIndex = i;
             break;
         }
     }
     if (foundTatgetIndex < 0) {
         lock_release(swapFileLookupLock);
+        lock_release(swapFileLock);
         return EFAULT;
     }
 
@@ -174,7 +175,7 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     swap_res = TLB_Probe((u_int32_t)targetAddr, 0);
 
     if (swap_res < 0) {
-        //TODO: may need to added status info and stuff... for not ..... mehhhhh
+        //TODO: may need to added status info 
         swap_j = tlb_get_rr_victim();
         lock_release(swapFileLookupLock);
         lock_release(swapFileLock);
@@ -192,8 +193,8 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     copyUIO.uio_segflg = (inIns) ? UIO_USERISPACE : UIO_USERSPACE;
 
 
-    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
-    kprintf ("%p\t%d\t%p\n", targetAddr, lastOffset, targetAddrs);
+    //kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
+   // kprintf ("%p\t%d\t%p\n", targetAddr, foundTatgetIndex, targetAddrs);
     result = VOP_READ(swapFile, &copyUIO);
 
     errRes = enableReadForPte(targetAddr, targetAddrs);
@@ -207,8 +208,14 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
         lock_release(swapFileLock);
         return errRes;
     }
+
+
     lock_release(swapFileLookupLock);
     lock_release(swapFileLock);
+
+    updateCoreMap(swap_paddr,targetAddr, targetAddrs);
+  //  dumpCoreMap();
+  //  dumpTLB();
     return 0;
 }
 
@@ -255,6 +262,16 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
 
 
     int roataion = 0;
+    int i = 0;
+    for (i = 0; i < SWAP_ENTRY_COUNT; i++) {
+        if (swapLookupTable[i].addr == targetAddr) {
+            lastOffset = i;
+        }else if (swapLookupTable[i].addr == 0) {
+            lastOffset = i;
+        }
+
+    }
+#if abc
     while (swapLookupTable[lastOffset].addr != 0){
         lastOffset ++ ;
         /*
@@ -269,6 +286,7 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
         */
         lastOffset = lastOffset % SWAP_ENTRY_COUNT;
     }
+#endif
     swapLookupTable[lastOffset].addr = targetAddr;
     swapLookupTable[lastOffset].offset = lastOffset;
     swapLookupTable[lastOffset].belongToAddrsapce = addrSpace;
@@ -277,8 +295,8 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
     mk_kuio(&copyUIO, (void*)targetAddr, PAGE_SIZE, lastOffset*PAGE_SIZE, UIO_WRITE);
     copyUIO.uio_space = targetAddrs;
     copyUIO.uio_segflg = (inIns) ? UIO_USERISPACE : UIO_USERSPACE;
-    kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
-    kprintf ("%p\t%d\t%p\n", targetAddr, lastOffset, addrSpace);
+    //kprintf ("[%s]\t%s\t:\t%d\tvalue: %d\n", __FILE__ , __PRETTY_FUNCTION__, __LINE__, 0);
+    //kprintf ("%p\t%d\t%p\n", targetAddr, lastOffset, addrSpace);
 
     result = VOP_WRITE(swapFile, &copyUIO);
 
@@ -294,6 +312,7 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
  
     lock_release(swapFileLookupLock);
     lock_release(swapFileLock);
+//    dumpTLB();
     return 0;
 }
 

@@ -28,6 +28,9 @@ int disableReadForPte (vaddr_t vaddr,void* addrS); /* report inserted pte back t
 void vm_shutdown();
 int enableReadForPte (vaddr_t vaddr,void* addrS); /* report inserted pte back to pte */
 
+
+
+int updateCoreMap(paddr_t paddr, vaddr_t vaddr, void* addrSpace);
 #endif
 
 #endif /* _COREMAP_H_ */

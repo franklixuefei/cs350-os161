@@ -22,7 +22,7 @@
 #include <addrspace.h>
 
 struct swapEntry {
-    paddr_t addr;
+    vaddr_t addr;
     int offset;
     struct addrspace* belongToAddrsapce;
 };
