@@ -139,7 +139,7 @@ probePte (vaddr_t vaddr , struct Pte **rPte, int* hasPageFault)
 
 // Will turn on readable bit for the vaddr entry in pagetables
 int
-enableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte */
+enableReadForPte (vaddr_t vaddr,void* addrS, paddr_t paddr) /* report inserted pte back to pte */
 {
     struct addrspace* addrSpace = (struct addrspace*)addrS;
     if (addrSpace == NULL) {
@@ -174,13 +174,14 @@ enableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte 
     assert(pte->valid == 1);
     assert((pte->flag&PF_R)==0); // FIXME
     pte->flag |= PF_R;
+    pte->frameNum = paddr & PAGE_FRAME;
     return 0;
 }
 
 
 // Will turn off readable bit for the vaddr entry in pagetables
 int
-disableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte */
+disableReadForPte (vaddr_t vaddr,void* addrS, paddr_t paddr) /* report inserted pte back to pte */
 {
     struct addrspace* addrSpace = (struct addrspace*)addrS;
     if (addrSpace == NULL) {
@@ -216,10 +217,8 @@ disableReadForPte (vaddr_t vaddr,void* addrS) /* report inserted pte back to pte
     assert(pte->valid == 1);
     assert(pte->flag&PF_R); // FIXME
     pte->flag &= ~PF_R;
-    
-
-
-
+    pte->frameNum = 0;
+    /* shoot down corresponding TLB entry */
     res = TLB_Probe((u_int32_t)vaddr, 0);
     assert(res>=0);
     TLB_Write(TLBHI_INVALID(res), TLBLO_INVALID(), res);
@@ -293,7 +292,7 @@ allocZeroedPage(vaddr_t vaddr, struct Pte* pte, int segNum) // refer to load_seg
     int result, i;
     paddr_t paddr;
 
-    
+    struct addrspace *as = curthread->t_vmspace;
     u_int32_t ehi, elo;
     u.uio_iovec.iov_ubase = (userptr_t)vaddr;
     u.uio_iovec.iov_len = PAGE_SIZE; // length of the memory space
@@ -301,7 +300,7 @@ allocZeroedPage(vaddr_t vaddr, struct Pte* pte, int segNum) // refer to load_seg
     u.uio_offset = 0;
     u.uio_segflg = UIO_USERSPACE;
     u.uio_rw = UIO_READ;
-    u.uio_space = curthread->t_vmspace;
+    u.uio_space = as;
     
     paddr = getppages(1, vaddr);
     

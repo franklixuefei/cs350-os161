@@ -157,7 +157,8 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     if (foundTatgetIndex < 0) {
         lock_release(swapFileLookupLock);
         lock_release(swapFileLock);
-        return EFAULT;
+        //return EFAULT;
+        panic("entry not found in SWAPFILE\n");
     }
 
 
@@ -207,7 +208,7 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
    // kprintf ("%p\t%d\t%p\n", targetAddr, foundTatgetIndex, targetAddrs);
     result = VOP_READ(swapFile, &copyUIO);
 
-    errRes = enableReadForPte(targetAddr, targetAddrs);
+    errRes = enableReadForPte(targetAddr, targetAddrs, swap_paddr);
 
     if (segNum == PT_CODE) {
         TLB_Write(targetAddr, swap_paddr | TLBLO_VALID, swap_j);
@@ -223,7 +224,7 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     lock_release(swapFileLookupLock);
     lock_release(swapFileLock);
 
-    updateCoreMap(swap_paddr,targetAddr, targetAddrs);
+    coremap_insert(swap_paddr,targetAddr, targetAddrs);
   //  dumpCoreMap();
   //  dumpTLB();
     return 0;
@@ -312,7 +313,7 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
     result = VOP_WRITE(swapFile, &copyUIO);
 
     lastOffset++;
-    errRes = disableReadForPte (targetAddr, targetAddrs);
+    errRes = disableReadForPte (targetAddr, targetAddrs, 0);
 
 
     if (errRes) { 

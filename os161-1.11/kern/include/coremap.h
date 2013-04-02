@@ -24,13 +24,13 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr);
 paddr_t getppages(unsigned long npages, vaddr_t vaddr);
 vaddr_t alloc_kpages(int npages);
 void free_kpages(vaddr_t addr);
-int disableReadForPte (vaddr_t vaddr,void* addrS); /* report inserted pte back to pte */
+int disableReadForPte (vaddr_t vaddr,void* addrS, paddr_t paddr); /* report inserted pte back to pte */
 void vm_shutdown();
-int enableReadForPte (vaddr_t vaddr,void* addrS); /* report inserted pte back to pte */
+int enableReadForPte (vaddr_t vaddr,void* addrS, paddr_t paddr); /* report inserted pte back to pte */
 
 void cormap_free(void* addrSpace);
 
-int updateCoreMap(paddr_t paddr, vaddr_t vaddr, void* addrSpace);
+int coremap_insert(paddr_t paddr, vaddr_t vaddr, void* addrSpace);
 #endif
 
 #endif /* _COREMAP_H_ */

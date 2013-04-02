@@ -30,7 +30,7 @@ dumpCoreMap()
 
 
 int
-updateCoreMap(paddr_t paddr, vaddr_t vaddr, void* addrSpace)
+coremap_insert(paddr_t paddr, vaddr_t vaddr, void* addrSpace)
 {
     struct addrspace *addrs = (struct addrspace* )addrSpace;
     int i =0;
@@ -78,6 +78,8 @@ vm_bootstrap(void)
         coremap_table[i].length = 0;
         coremap_table[i].t_pid = 0;
         coremap_table[i].addrSpace = NULL;
+        coremap_table[i].paddr = 0;
+        coremap_table[i].vaddr = 0;
     }
 }
 
@@ -111,7 +113,7 @@ paddr_t getppages(unsigned long npages, vaddr_t vaddr)
 {
 	int spl;
 	paddr_t addr;
-	spl = splhigh();
+	spl = splhigh(); // TODO maybe use a lock instead?
 //	addr = ram_stealmem(npages);
 	addr = coremap_table? vm_getppages(npages, vaddr) : ram_stealmem(npages);
 	splx(spl);
@@ -138,7 +140,7 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
                 if (coremap_table[i+j].occupied != 0) 
                     break;
             }
-            if (j == npages) {
+            if (j == npages) { /* found a place to fit */
                 paddr = i * PAGE_SIZE + start;
                 for (k=0; k < npages; k++) {
                     coremap_table[i+k].occupied = 1;
@@ -165,8 +167,6 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
         }
     }
     if (paddr == 0) {
-//        kprintf("out of memory!\n");
-        
         int targetPage = page_get_rr_victim();
         int result = swapOut(coremap_table[targetPage].vaddr, (struct addrspace*)(coremap_table[targetPage].addrSpace));
         if (result) {
@@ -174,13 +174,13 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
         }
         coremap_table[targetPage].occupied = 0;
         coremap_table[targetPage].vaddr =  0;
+        coremap_table[targetPage].length =  0;
         coremap_table[targetPage].addrSpace = 0;
+        coremap_table[targetPage].paddr = 0;
+        coremap_table[targetPage].t_pid = 0;
         
         //dumpCoreMap();
-        //dumpCoreMap();
-        //return coremap_table[targetPage].paddr;
-        return vm_getppages(npages, vaddr);
-        //do page replacement here!!!!!
+        return vm_getppages(npages, vaddr); /* now, see if we have a place to fit */
     }
     return paddr;
 }
@@ -192,7 +192,7 @@ alloc_kpages(int npages)
     // 0x8badf00d will indicate these pages belongs to kernel and shouldnt be swapped
     pa = getppages(npages, 0x8badf00d);
     if (pa == 0) {
-        return 0; // not sure!!!!!
+        return 0;
     }
     return PADDR_TO_KVADDR(pa);
 }
@@ -200,9 +200,25 @@ alloc_kpages(int npages)
 void
 free_kpages(vaddr_t addr)
 {
-	 //nothing 
-    
+#if OPT_A3
+        paddr_t paddr = KVADDR_TO_PADDR(addr);
+        if (paddr > start) {
+            int index = (paddr - start) / PAGE_SIZE;
+            assert(coremap_table[index].t_pid == curthread->pid);
+            int length = coremap_table[index].length;
+            int i;
+            for (i = index; i < length + index; ++i) {
+                coremap_table[i].vaddr = 0;
+                coremap_table[i].paddr = 0;
+                coremap_table[i].occupied = 0;
+                coremap_table[i].length = 0;
+                coremap_table[i].t_pid = 0;
+                coremap_table[i].addrSpace = NULL;
+            }
+        }
+#else
 	(void)addr;
+#endif
 }
 
 void
@@ -215,7 +231,7 @@ coremap_free(void* addrs)
             coremap_table[i].vaddr = 0;
             coremap_table[i].paddr = 0;
             coremap_table[i].occupied = 0;
-            coremap_table[i].length = -1;
+            coremap_table[i].length = 0;
             coremap_table[i].t_pid = 0;
             coremap_table[i].addrSpace = NULL;
         }

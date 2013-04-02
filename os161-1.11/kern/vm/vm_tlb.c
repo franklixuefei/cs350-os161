@@ -61,7 +61,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
     
 	switch (faulttype) {
             case VM_FAULT_READONLY:
-#if abc
                 /* if this is a readonly violation - check if the flag in pte contains writeable or not... */
                 errNum = probePte(faultaddress, &faultPte, &hasPageFault); // TODO probePte needs more detailed work.
                 if (errNum) {
@@ -87,7 +86,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     splx(spl);
                     return EFAULT; /* TODO: maybe kill_curthread */
                 }
-#endif
                 splx(spl);
                 return EFAULT;
 	    case VM_FAULT_READ:
