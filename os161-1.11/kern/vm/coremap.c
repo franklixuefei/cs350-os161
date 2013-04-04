@@ -1,3 +1,6 @@
+#include "opt-A3.h"
+#if OPT_A3   
+
 #include <coremap.h>
 #include <machine/spl.h>
 #include <machine/tlb.h>
@@ -15,7 +18,7 @@ static paddr_t start, end;
 static int32_t num_entries;
 struct coremap* coremap_table;
 
-
+/* for testing */
 void
 dumpCoreMap()
 {
@@ -49,19 +52,11 @@ coremap_insert(paddr_t paddr, vaddr_t vaddr, void* addrSpace)
 void
 vm_bootstrap(void)
 {
-    //vmstats_init();
-//    ram_getsize(&start, &end);
+
     assert(coremap_table == NULL);
     assert((start&PAGE_FRAME)==start);
     assert((end&PAGE_FRAME)==end);
-    /*
-    num_entries = (end - start) / (PAGE_SIZE+sizeof(struct coremap));
-    int remainder = (end - start) % (PAGE_SIZE+sizeof(struct coremap));
-    coremap_table = (struct coremap*)PADDR_TO_KVADDR(start);
-    start += num_entries * sizeof(struct coremap);
-    // do we have to update the start paddr to an int?????
-    assert(start + num_entries * PAGE_SIZE+remainder == end);
-    */
+
     u_int32_t ramsize = mips_ramsize();
     num_entries = ramsize/PAGE_SIZE;
     u_int32_t i;
@@ -71,7 +66,6 @@ vm_bootstrap(void)
     ram_getsize(&start, &end);
 
     num_entries = (end-start)/PAGE_SIZE;
-
 
     for (i = 0; i < num_entries; i++) {
         coremap_table[i].occupied = 0;
@@ -95,7 +89,7 @@ page_get_rr_victim()
 {
     int victim;
     static unsigned int next_page_victim = 0;
-    // 0x8badf00d will indicate these pages belongs to kernel and shouldnt be swapped
+    // 0x8badf00d indicates that these pages belong to kernel and should not be swapped
     while(coremap_table[next_page_victim].addrSpace == NULL || 
             coremap_table[next_page_victim].occupied == 0 || 
             coremap_table[next_page_victim].vaddr == 0x8badf00d ) {
@@ -114,7 +108,6 @@ paddr_t getppages(unsigned long npages, vaddr_t vaddr)
 	int spl;
 	paddr_t addr;
 	spl = splhigh(); // TODO maybe use a lock instead?
-//	addr = ram_stealmem(npages);
 	addr = coremap_table? vm_getppages(npages, vaddr) : ram_stealmem(npages);
 	splx(spl);
 	return addr;
@@ -146,7 +139,7 @@ paddr_t vm_getppages(int npages, vaddr_t vaddr)
                     coremap_table[i+k].occupied = 1;
                     coremap_table[i+k].length = npages-k;
                     coremap_table[i+k].t_pid = curthread->pid; 
-    // 0x8badf00d will indicate these pages belongs to kernel and shouldnt be swapped
+                    // 0x8badf00d will indicate these pages belongs to kernel and shouldnt be swapped
                     if (vaddr != 0x8badf00d) {
                         coremap_table[i+k].vaddr = vaddr+k*PAGE_SIZE;
                     }else{
@@ -200,7 +193,6 @@ alloc_kpages(int npages)
 void
 free_kpages(vaddr_t addr)
 {
-#if OPT_A3
         paddr_t paddr = KVADDR_TO_PADDR(addr);
         if (paddr > start) {
             int index = (paddr - start) / PAGE_SIZE;
@@ -216,9 +208,6 @@ free_kpages(vaddr_t addr)
                 coremap_table[i].addrSpace = NULL;
             }
         }
-#else
-	(void)addr;
-#endif
 }
 
 void
@@ -238,3 +227,5 @@ coremap_free(void* addrs)
     }
     swapTableFree(addrSpace);
 }
+
+#endif

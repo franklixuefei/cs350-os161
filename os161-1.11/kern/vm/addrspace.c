@@ -65,11 +65,6 @@ as_destroy(struct addrspace *as)
 {
 	/*
 	 * Clean up as needed.
-         *
-         *TODO: NEED  TO FREE core map stuff!
-         *
-         *
-         *
 	 */
 #if OPT_A3
     unsigned int i;

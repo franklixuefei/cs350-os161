@@ -1,26 +1,6 @@
-/*
- * =====================================================================================
- *
- *       Filename:  pt.c
- *
- *    Description:  page table
- *
- *        Version:  1.0
- *        Created:  03/24/2013 02:16:43 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *   Organization:  :
- *
- * =====================================================================================
- */
-
-
 #include "opt-A3.h"
 
 #if OPT_A3   
-
-
 
 #include <types.h>
 #include <kern/errno.h>

@@ -318,8 +318,8 @@ main.o: ../../main/main.c ../../include/types.h machine/types.h \
   ../../include/scheduler.h ../../include/dev.h ../../include/vfs.h \
   ../../include/vm.h machine/vm.h ../../include/syscall.h \
   machine/trapframe.h ../../include/version.h opt-A0.h opt-A3.h \
-  ../../include/swapfile.h ../../include/addrspace.h opt-dumbvm.h \
-  opt-A3.h ../../include/uw-vmstats.h
+  ../../include/swapfile.h opt-A3.h ../../include/addrspace.h \
+  opt-dumbvm.h ../../include/uw-vmstats.h
 menu.o: ../../main/menu.c ../../include/types.h machine/types.h \
   ../../include/kern/types.h machine/ktypes.h ../../include/kern/errno.h \
   ../../include/kern/unistd.h ../../include/kern/limits.h \
@@ -479,18 +479,18 @@ vm_tlb.o: ../../vm/vm_tlb.c opt-A3.h ../../include/types.h \
   ../../include/thread.h opt-A2.h machine/pcb.h machine/setjmp.h \
   ../../include/lib.h ../../include/kern/errno.h \
   ../../include/uw-vmstats.h ../../include/pt.h ../../include/elf.h
-coremap.o: ../../vm/coremap.c ../../include/coremap.h opt-A3.h \
+coremap.o: ../../vm/coremap.c opt-A3.h ../../include/coremap.h opt-A3.h \
   ../../include/types.h machine/types.h ../../include/kern/types.h \
   machine/ktypes.h machine/spl.h machine/tlb.h ../../include/kern/errno.h \
   ../../include/lib.h machine/setjmp.h ../../include/addrspace.h \
   ../../include/vm.h machine/vm.h opt-dumbvm.h ../../include/uw-vmstats.h \
   ../../include/thread.h opt-A2.h machine/pcb.h ../../include/curthread.h \
   ../../include/swapfile.h
-swapfile.o: ../../vm/swapfile.c ../../include/swapfile.h \
-  ../../include/types.h machine/types.h ../../include/kern/types.h \
-  machine/ktypes.h ../../include/addrspace.h ../../include/vm.h \
-  machine/vm.h opt-dumbvm.h opt-A3.h machine/tlb.h ../../include/synch.h \
-  opt-A1.h ../../include/queue.h ../../include/pt.h \
+swapfile.o: ../../vm/swapfile.c opt-A3.h ../../include/swapfile.h \
+  opt-A3.h ../../include/types.h machine/types.h \
+  ../../include/kern/types.h machine/ktypes.h ../../include/addrspace.h \
+  ../../include/vm.h machine/vm.h opt-dumbvm.h machine/tlb.h \
+  ../../include/synch.h opt-A1.h ../../include/queue.h ../../include/pt.h \
   ../../include/kern/errno.h ../../include/thread.h opt-A2.h \
   machine/pcb.h machine/setjmp.h ../../include/uio.h \
   ../../include/vnode.h ../../include/coremap.h \

@@ -1,20 +1,5 @@
-/*
- * =====================================================================================
- *
- *       Filename:  swapOps.c
- *
- *    Description:  setup and operations of swap file
- *
- *        Version:  1.0
- *        Created:  03/27/2013 05:51:02 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
- */
+#include "opt-A3.h"
+#if OPT_A3   
 
 #include <swapfile.h>
 #include <machine/tlb.h>
@@ -88,14 +73,6 @@ shutdownSwapOps ()
 }
 
 
-
-//TODO: UPDATE CORE MAP AND ADDRESS SPACE
-//int
-//swapMemory (paddr_t fromMemoryLoc, paddr_t toSwapFileLoc){
-
-//}
-
-
 int
 lookup (paddr_t address, int* offset)
 {
@@ -125,24 +102,6 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     u_int32_t ehi, elo;
     struct uio copyUIO; 
     int inIns =0, result;
-    /*
-    struct addrspace * targetAddrs = addrSpace;
-     switch (segType){
-        case PT_DATA:
-            inIns = 1;
-            targetAddr = targetAddrs->pt_data[segOffset]->frameNum;
-            break;
-        case PT_STACK:
-            targetAddr = targetAddrs->pt_stack[segOffset]->frameNum;
-            break;
-        case PT_CODE:
-            targetAddr = targetAddrs->pt_code[segOffset]->frameNum;
-            break;
-        default:
-            return EFAULT;
-    }
-     * */
-
 
     lock_acquire(swapFileLock);
     lock_acquire(swapFileLookupLock);
@@ -157,11 +116,8 @@ swapIn (vaddr_t targetAddr, struct addrspace* targetAddrs)
     if (foundTatgetIndex < 0) {
         lock_release(swapFileLookupLock);
         lock_release(swapFileLock);
-        //return EFAULT;
         panic("entry not found in SWAPFILE\n");
     }
-
-
 
     int segNum = -1;
     int errRes = calculate_segment(targetAddrs, targetAddr, &segNum);
@@ -242,25 +198,8 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
     assert(targetAddr != 0);
     struct uio copyUIO; 
     int inIns = 0, result;
-//    vaddr_t targetAddr = 0;
     struct addrspace * targetAddrs = (struct addrspace *)addrSpace;
-//    int segnmentType = segType;
-/*
-    switch (segType){
-        case PT_DATA:
-            inIns = 1;
-            targetAddr = targetAddrs->pt_data[segOffset]->frameNum;
-            break;
-        case PT_STACK:
-            targetAddr = targetAddrs->pt_stack[segOffset]->frameNum;
-            break;
-        case PT_CODE:
-            targetAddr = targetAddrs->pt_code[segOffset]->frameNum;
-            break;
-        default:
-            return EFAULT;
-    }
- * */
+
     int segNum = -1;
     int errRes = calculate_segment(addrSpace, targetAddr, &segNum);
     if (errRes) {
@@ -278,27 +217,17 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
     for (i = 0; i < SWAP_ENTRY_COUNT; i++) {
         if (swapLookupTable[i].addr == targetAddr) {
             lastOffset = i;
+            break;
         }else if (swapLookupTable[i].addr == 0) {
             lastOffset = i;
+            break;
         }
 
     }
-#if abc
-    while (swapLookupTable[lastOffset].addr != 0){
-        lastOffset ++ ;
-        /*
-        if ((lastOffset - SWAP_ENTRY_COUNT) > 0) {
-            roataion ++;
-            if (roataion > 1) {
-                lock_release(swapFileLookupLock);
-                lock_release(swapFileLock);
-                return ENOMEM;
-            }
-        }
-        */
-        lastOffset = lastOffset % SWAP_ENTRY_COUNT;
+    if (i == SWAP_ENTRY_COUNT) {
+        panic("Out of swap space\n");
     }
-#endif
+
     swapLookupTable[lastOffset].addr = targetAddr;
     swapLookupTable[lastOffset].offset = lastOffset;
     swapLookupTable[lastOffset].belongToAddrsapce = addrSpace;
@@ -312,9 +241,7 @@ swapOut (vaddr_t targetAddr, struct addrspace* addrSpace)
 
     result = VOP_WRITE(swapFile, &copyUIO);
 
-    lastOffset++;
     errRes = disableReadForPte (targetAddr, targetAddrs, 0);
-
 
     if (errRes) { 
         lock_release(swapFileLookupLock);
@@ -341,3 +268,4 @@ swapTableFree(struct addrspace* addrs)
    }
 }
 
+#endif
