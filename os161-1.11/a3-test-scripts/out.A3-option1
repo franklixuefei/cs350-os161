@@ -3,39 +3,39 @@ RUNNING ./run-batch-A3-option1 : Version 1.0
 ***************  RUNNING [test-vm-big-fork] TESTS  ******************
 
 
-CS350-036's system version 036 (ASST3 #169)
+CS350-036's system version 036 (ASST3 #200)
 
 
 OS/161 kernel: p uw-testbin/vm-mix1-fork
 sleep: Dropping thread <boot/menu>
 panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6649265 cycles (3476993 run, 3172272 global-idle)
-sys161:   cpu0: 3476974 kern, 19 user, 0 idle)
-sys161: 624 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.268428 seconds (24.7711 mhz)
-sys161: Elapsed virtual time: 0.265970617 seconds (25 mhz)
+sys161: 6641332 cycles (3472738 run, 3168594 global-idle)
+sys161:   cpu0: 3472719 kern, 19 user, 0 idle)
+sys161: 620 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
+sys161: Elapsed real time: 0.267012 seconds (24.8728 mhz)
+sys161: Elapsed virtual time: 0.265653297 seconds (25 mhz)
 -----------
 
 
 
-CS350-036's system version 036 (ASST3 #169)
+CS350-036's system version 036 (ASST3 #200)
 
 
 OS/161 kernel: p uw-testbin/vm-mix1-fork
 sleep: Dropping thread <boot/menu>
 panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6650944 cycles (3478383 run, 3172561 global-idle)
-sys161:   cpu0: 3478364 kern, 19 user, 0 idle)
-sys161: 622 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.268818 seconds (24.7414 mhz)
-sys161: Elapsed virtual time: 0.266037777 seconds (25 mhz)
+sys161: 6652515 cycles (3479157 run, 3173358 global-idle)
+sys161:   cpu0: 3479138 kern, 19 user, 0 idle)
+sys161: 624 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
+sys161: Elapsed real time: 0.268766 seconds (24.7521 mhz)
+sys161: Elapsed virtual time: 0.266100617 seconds (25 mhz)
 -----------
 
 ---------------------------------------------------------------
 ***************  RUNNING [test-vm-big-fork-exec] TESTS  ******************
 
 
-CS350-036's system version 036 (ASST3 #169)
+CS350-036's system version 036 (ASST3 #200)
 
 
 OS/161 kernel: p testbin/parallelvm
@@ -43,72 +43,72 @@ Job size approximately 58800 bytes
 Forking 24 jobs; total load 1378k
 sleep: Dropping thread <boot/menu>
 panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6469788 cycles (3424807 run, 3044981 global-idle)
-sys161:   cpu0: 3418317 kern, 6490 user, 0 idle)
-sys161: 685 irqs 76 exns 0r/0w disk 0r/755w console 18r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.253655 seconds (25.5063 mhz)
-sys161: Elapsed virtual time: 0.258791537 seconds (25 mhz)
+sys161: 6405684 cycles (3366067 run, 3039617 global-idle)
+sys161:   cpu0: 3359577 kern, 6490 user, 0 idle)
+sys161: 686 irqs 76 exns 0r/0w disk 0r/755w console 18r/1w/6m emufs 0r/0w net
+sys161: Elapsed real time: 0.258529 seconds (24.7774 mhz)
+sys161: Elapsed virtual time: 0.256227377 seconds (25 mhz)
 -----------
 
 
-CS350-036's system version 036 (ASST3 #169)
+CS350-036's system version 036 (ASST3 #200)
 
 
 OS/161 kernel: p testbin/triplesort
 testbin/triplesort: Starting: running three copies of /testbin/sort...
 sleep: Dropping thread <boot/menu>
 panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6387344 cycles (3341660 run, 3045684 global-idle)
-sys161:   cpu0: 3339292 kern, 2368 user, 0 idle)
-sys161: 689 irqs 49 exns 0r/0w disk 0r/757w console 18r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.258117 seconds (24.7459 mhz)
-sys161: Elapsed virtual time: 0.255493777 seconds (25 mhz)
+sys161: 6321795 cycles (3213270 run, 3108525 global-idle)
+sys161:   cpu0: 3210902 kern, 2368 user, 0 idle)
+sys161: 686 irqs 49 exns 0r/0w disk 0r/757w console 18r/1w/6m emufs 0r/0w net
+sys161: Elapsed real time: 0.254364 seconds (24.8533 mhz)
+sys161: Elapsed virtual time: 0.252871817 seconds (25 mhz)
 -----------
 
 
-CS350-036's system version 036 (ASST3 #169)
+CS350-036's system version 036 (ASST3 #200)
 
 
 OS/161 kernel: p testbin/triplemat
 testbin/triplemat: Starting: running three copies of /testbin/matmult...
 sleep: Dropping thread <boot/menu>
 panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6388390 cycles (3342528 run, 3045862 global-idle)
-sys161:   cpu0: 3340134 kern, 2394 user, 0 idle)
-sys161: 688 irqs 49 exns 0r/0w disk 0r/758w console 18r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.250351 seconds (25.5177 mhz)
-sys161: Elapsed virtual time: 0.255535617 seconds (25 mhz)
+sys161: 6327205 cycles (3233724 run, 3093481 global-idle)
+sys161:   cpu0: 3231330 kern, 2394 user, 0 idle)
+sys161: 687 irqs 49 exns 0r/0w disk 0r/758w console 18r/1w/6m emufs 0r/0w net
+sys161: Elapsed real time: 0.251801 seconds (25.1278 mhz)
+sys161: Elapsed virtual time: 0.253088217 seconds (25 mhz)
 -----------
 
 
-CS350-036's system version 036 (ASST3 #169)
+CS350-036's system version 036 (ASST3 #200)
 
 
 OS/161 kernel: p testbin/triplehuge
 testbin/triplehuge: Starting: running three copies of /testbin/huge...
 sleep: Dropping thread <boot/menu>
 panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6388791 cycles (3340407 run, 3048384 global-idle)
-sys161:   cpu0: 3338039 kern, 2368 user, 0 idle)
+sys161: 6321938 cycles (3215268 run, 3106670 global-idle)
+sys161:   cpu0: 3212900 kern, 2368 user, 0 idle)
 sys161: 688 irqs 49 exns 0r/0w disk 0r/757w console 18r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.258439 seconds (24.7207 mhz)
-sys161: Elapsed virtual time: 0.255551657 seconds (25 mhz)
+sys161: Elapsed real time: 0.247027 seconds (25.5921 mhz)
+sys161: Elapsed virtual time: 0.252877537 seconds (25 mhz)
 -----------
 
 ---------------------------------------------------------------
 ***************  RUNNING [test-vm-big-fork-paging] TESTS  ******************
 
 
-CS350-036's system version 036 (ASST3 #169)
+CS350-036's system version 036 (ASST3 #200)
 
 
 OS/161 kernel: p uw-testbin/vm-mix1-fork
 sleep: Dropping thread <boot/menu>
 panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6503786 cycles (3209613 run, 3294173 global-idle)
-sys161:   cpu0: 3209594 kern, 19 user, 0 idle)
-sys161: 621 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.253526 seconds (25.6533 mhz)
-sys161: Elapsed virtual time: 0.260151457 seconds (25 mhz)
+sys161: 6505378 cycles (3208025 run, 3297353 global-idle)
+sys161:   cpu0: 3208006 kern, 19 user, 0 idle)
+sys161: 622 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
+sys161: Elapsed real time: 0.252954 seconds (25.7176 mhz)
+sys161: Elapsed virtual time: 0.260215137 seconds (25 mhz)
 -----------
 
