@@ -115,7 +115,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         if (!hasPageFault) vmstats_inc(VMSTAT_TLB_RELOAD);
         else {
             splx(spl);
-            return 0;
+            return 0; // page fault has been handled - TLB has already been updated.
         }
         paddr = faultPte->frameNum + (faultaddress % PAGE_SIZE);     
         /* make sure it is page-aligned */

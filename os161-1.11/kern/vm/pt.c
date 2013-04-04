@@ -352,6 +352,7 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
 	struct uio ku;
         paddr_t paddr;
         struct vnode* v = curthread->t_vmspace->elf_file_vnode;
+        vaddr_t baseValue =0; 
 	/*
 	 * Read the executable header from offset 0 in the file.
 	 */
@@ -412,6 +413,7 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
                         if (ph.p_vaddr == vbase1) {
                             if (segNum == PT_CODE) {
                                 offset = vaddr - vbase1 + ph.p_offset;
+                                baseValue = vbase1;
                                 break;
                             } else {
                                 continue;
@@ -419,6 +421,7 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
                         } else if (ph.p_vaddr == vbase2) {
                             if (segNum == PT_DATA) {
                                 offset = vaddr - vbase2 + ph.p_offset;
+                                baseValue = vbase2;
                                 break;
                             } else {
                                 continue;
@@ -460,14 +463,23 @@ loadPageFromElf(vaddr_t vaddr, struct Pte* pte, int segNum)
                 TLB_Write(vaddr, paddr | TLBLO_VALID | TLBLO_DIRTY, j);
                 
                 /* load data from ELF file and construct code and data segments */
-                if (ph.p_filesz - offset + ph.p_offset > PAGE_SIZE){
-                    result = load_segment(curthread->t_vmspace->elf_file_vnode, offset, vaddr, PAGE_SIZE, PAGE_SIZE,ph.p_flags & PF_X);
-                }else{
-                    result = load_segment(curthread->t_vmspace->elf_file_vnode, offset, vaddr, PAGE_SIZE, ph.p_filesz - offset + ph.p_offset, ph.p_flags & PF_X);
+                if (ph.p_filesz + baseValue > vaddr ) {
+                    if (ph.p_filesz - offset + ph.p_offset > PAGE_SIZE){
+                        result = load_segment(curthread->t_vmspace->elf_file_vnode, offset, vaddr, PAGE_SIZE, PAGE_SIZE,ph.p_flags & PF_X);
+                    }else{
+                        result = load_segment(curthread->t_vmspace->elf_file_vnode, offset, vaddr, PAGE_SIZE, ph.p_filesz - offset + ph.p_offset, ph.p_flags & PF_X);
+                    }
+                    if (result) {
+    			return result;
+		    }
+                }else {
+                    int i =0;
+                    for (i = 0; i < PAGE_SIZE; i++) {
+                        *((char*)vaddr +i) = 0;
+                    }
+//                    result = uiomovezeros(PAGE_SIZE, &u);
+//
                 }
-               	if (result) {
-			return result;
-		}
 
                 /* finally, we turn off the dirty flag for undirtiable segments */
                 if (!(pte->flag & PF_W)) {

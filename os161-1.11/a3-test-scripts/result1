@@ -1,14 +1,15 @@
+./run-batch-A3-all
 RUNNING ./run-batch-A3 : Version 1.0
 ---------------------------------------------------------------
 ************** RUNNING [test-vm-basic] TESTS ******************
 
 
-CS350-036's system version 036 (ASST3 #200)
+CS350-036's system version 036 (ASST3 #169)
 
 
 OS/161 kernel: p uw-testbin/vm-stack1
 SUCCEEDED
-Operation took 0.911135257 seconds
+Operation took 0.911509337 seconds
 OS/161 kernel: q
 Shutting down.
 VMSTATS:
@@ -26,42 +27,42 @@ VMSTAT TLB Faults with Free + TLB Faults with Replace = 12
 VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 12
 VMSTAT ELF File reads + Swapfile reads = 2
 The system is halted.
-sys161: 27980833 cycles (6521875 run, 21458958 global-idle)
-sys161:   cpu0: 6420139 kern, 101736 user, 0 idle)
-sys161: 1408 irqs 23 exns 0r/0w disk 0r/1312w console 13r/1w/7m emufs 0r/0w net
-sys161: Elapsed real time: 1.118161 seconds (25.024 mhz)
-sys161: Elapsed virtual time: 1.119233337 seconds (25 mhz)
+sys161: 27993589 cycles (6584496 run, 21409093 global-idle)
+sys161:   cpu0: 6482760 kern, 101736 user, 0 idle)
+sys161: 1412 irqs 23 exns 0r/0w disk 0r/1312w console 13r/1w/7m emufs 0r/0w net
+sys161: Elapsed real time: 1.118181 seconds (25.0349 mhz)
+sys161: Elapsed virtual time: 1.119743577 seconds (25 mhz)
 -----------
 
 
-CS350-036's system version 036 (ASST3 #200)
+CS350-036's system version 036 (ASST3 #169)
 
 
 OS/161 kernel: p uw-testbin/vm-stack2
-SUCCEEDED
-Operation took 0.910586617 seconds
+FAILED uninit[960] = 4197472 != 0
+Operation took 0.911100337 seconds
 OS/161 kernel: q
 Shutting down.
 VMSTATS:
-VMSTAT                TLB Faults =         21
-VMSTAT      TLB Faults with Free =         21
+VMSTAT                TLB Faults =          5
+VMSTAT      TLB Faults with Free =          5
 VMSTAT   TLB Faults with Replace =          0
 VMSTAT         TLB Invalidations =          1
 VMSTAT               TLB Reloads =          0
-VMSTAT      Page Faults (Zeroed) =         10
-VMSTAT        Page Faults (Disk) =         11
-VMSTAT      Page Faults from ELF =         11
+VMSTAT      Page Faults (Zeroed) =          2
+VMSTAT        Page Faults (Disk) =          3
+VMSTAT      Page Faults from ELF =          3
 VMSTAT Page Faults from Swapfile =          0
 VMSTAT           Swapfile Writes =          0
-VMSTAT TLB Faults with Free + TLB Faults with Replace = 21
-VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 21
-VMSTAT ELF File reads + Swapfile reads = 11
+VMSTAT TLB Faults with Free + TLB Faults with Replace = 5
+VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 5
+VMSTAT ELF File reads + Swapfile reads = 3
 The system is halted.
-sys161: 27971496 cycles (7461375 run, 20510121 global-idle)
-sys161:   cpu0: 7202519 kern, 258856 user, 0 idle)
-sys161: 1446 irqs 32 exns 0r/0w disk 0r/1313w console 50r/1w/7m emufs 0r/0w net
-sys161: Elapsed real time: 1.127860 seconds (24.8005 mhz)
-sys161: Elapsed virtual time: 1.118859857 seconds (25 mhz)
+sys161: 27976970 cycles (5638767 run, 22338203 global-idle)
+sys161:   cpu0: 5629406 kern, 9361 user, 0 idle)
+sys161: 1441 irqs 40 exns 0r/0w disk 0r/1334w console 20r/1w/7m emufs 0r/0w net
+sys161: Elapsed real time: 1.127880 seconds (24.8049 mhz)
+sys161: Elapsed virtual time: 1.119078817 seconds (25 mhz)
 -----------
 
 ---------------------------------------------------------------

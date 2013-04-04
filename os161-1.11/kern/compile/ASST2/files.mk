@@ -504,6 +504,26 @@ uw-vmstats.o: ${S}/vm/uw-vmstats.c
 SRCS+=${S}/vm/uw-vmstats.c
 OBJS+=uw-vmstats.o
 
+vm_tlb.o: ${S}/vm/vm_tlb.c
+	${COMPILE.c} ${S}/vm/vm_tlb.c
+SRCS+=${S}/vm/vm_tlb.c
+OBJS+=vm_tlb.o
+
+coremap.o: ${S}/vm/coremap.c
+	${COMPILE.c} ${S}/vm/coremap.c
+SRCS+=${S}/vm/coremap.c
+OBJS+=coremap.o
+
+swapfile.o: ${S}/vm/swapfile.c
+	${COMPILE.c} ${S}/vm/swapfile.c
+SRCS+=${S}/vm/swapfile.c
+OBJS+=swapfile.o
+
+pt.o: ${S}/vm/pt.c
+	${COMPILE.c} ${S}/vm/pt.c
+SRCS+=${S}/vm/pt.c
+OBJS+=pt.o
+
 autoconf.o: ${S}/compile/ASST2/autoconf.c
 	${COMPILE.c} ${S}/compile/ASST2/autoconf.c
 SRCS+=${S}/compile/ASST2/autoconf.c

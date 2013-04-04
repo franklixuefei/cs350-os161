@@ -1,281 +1,69 @@
+./run-batch-A3-all
+RUNNING ./run-batch-A3 : Version 1.0
+---------------------------------------------------------------
+************** RUNNING [test-vm-basic] TESTS ******************
 
 
-CS350-036's system version 036 (ASST3 #169)
+CS350-036's system version 036 (ASST3 #200)
 
 
-OS/161 kernel: p uw-testbin/vm-stack2
-FAILED uninit[960] = 4197472 != 0
-Operation took 0.910922977 seconds
+OS/161 kernel: p uw-testbin/vm-stack1
+SUCCEEDED
+Operation took 0.912058057 seconds
 OS/161 kernel: q
 Shutting down.
 VMSTATS:
-VMSTAT                TLB Faults =          5
-VMSTAT      TLB Faults with Free =          5
+VMSTAT                TLB Faults =         12
+VMSTAT      TLB Faults with Free =         12
 VMSTAT   TLB Faults with Replace =          0
 VMSTAT         TLB Invalidations =          1
 VMSTAT               TLB Reloads =          0
-VMSTAT      Page Faults (Zeroed) =          2
-VMSTAT        Page Faults (Disk) =          3
-VMSTAT      Page Faults from ELF =          3
+VMSTAT      Page Faults (Zeroed) =         10
+VMSTAT        Page Faults (Disk) =          2
+VMSTAT      Page Faults from ELF =          2
 VMSTAT Page Faults from Swapfile =          0
 VMSTAT           Swapfile Writes =          0
-VMSTAT TLB Faults with Free + TLB Faults with Replace = 5
-VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 5
-VMSTAT ELF File reads + Swapfile reads = 3
+VMSTAT TLB Faults with Free + TLB Faults with Replace = 12
+VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 12
+VMSTAT ELF File reads + Swapfile reads = 2
 The system is halted.
-sys161: 27975532 cycles (5641450 run, 22334082 global-idle)
-sys161:   cpu0: 5632089 kern, 9361 user, 0 idle)
-sys161: 1445 irqs 40 exns 0r/0w disk 0r/1334w console 20r/1w/7m emufs 0r/0w net
-sys161: Elapsed real time: 1.128096 seconds (24.7989 mhz)
-sys161: Elapsed virtual time: 1.119021297 seconds (25 mhz)
+sys161: 28004989 cycles (6517127 run, 21487862 global-idle)
+sys161:   cpu0: 6415391 kern, 101736 user, 0 idle)
+sys161: 1410 irqs 23 exns 0r/0w disk 0r/1312w console 13r/1w/7m emufs 0r/0w net
+sys161: Elapsed real time: 1.101821 seconds (25.417 mhz)
+sys161: Elapsed virtual time: 1.120199577 seconds (25 mhz)
 -----------
 
 
-
------------
-
-
-)
---
-OS/161 kernel:  p uw-testbin/vm-stack2
-FAILED uninit[960] = 4197472 != 0
+CS350-036's system version 036 (ASST3 #200)
 
 
----------------------------------------------------------------
-************** RUNNING [test-vm-paging] TESTS ******************
------------------------------------------
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p uw-testbin/vm-mix1
-Checking uninitialized array1
-Checking uninitialized array2
-FAILED in file vm-mix1.c at line 107: array2[961] = 16 != 0
-Operation took 11.004918657 seconds
+OS/161 kernel: p uw-testbin/vm-stack2
+SUCCEEDED
+Operation took 0.911173017 seconds
 OS/161 kernel: q
 Shutting down.
 VMSTATS:
-VMSTAT                TLB Faults =        402
-VMSTAT      TLB Faults with Free =         64
-VMSTAT   TLB Faults with Replace =        338
+VMSTAT                TLB Faults =         21
+VMSTAT      TLB Faults with Free =         21
+VMSTAT   TLB Faults with Replace =          0
 VMSTAT         TLB Invalidations =          1
-VMSTAT               TLB Reloads =         10
-VMSTAT      Page Faults (Zeroed) =          2
-VMSTAT        Page Faults (Disk) =        390
-VMSTAT      Page Faults from ELF =        390
+VMSTAT               TLB Reloads =          0
+VMSTAT      Page Faults (Zeroed) =         10
+VMSTAT        Page Faults (Disk) =         11
+VMSTAT      Page Faults from ELF =         11
 VMSTAT Page Faults from Swapfile =          0
 VMSTAT           Swapfile Writes =          0
-VMSTAT TLB Faults with Free + TLB Faults with Replace = 402
-VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 402
-VMSTAT ELF File reads + Swapfile reads = 390
+VMSTAT TLB Faults with Free + TLB Faults with Replace = 21
+VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 21
+VMSTAT ELF File reads + Swapfile reads = 11
 The system is halted.
-sys161: 280226281 cycles (24030758 run, 256195523 global-idle)
-sys161:   cpu0: 21657341 kern, 2373417 user, 0 idle)
-sys161: 4451 irqs 523 exns 0r/0w disk 0r/1425w console 1954r/1w/7m emufs 0r/0w net
-sys161: Elapsed real time: 11.218484 seconds (24.979 mhz)
-sys161: Elapsed virtual time: 11.209051257 seconds (25 mhz)
------------------------------------------
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p uw-testbin/vm-mix2
-Checking uninitialized array1
-Checking uninitialized array2
-FAILED in file vm-mix2.c at line 115: array2[961] = 16 != 0
-Operation took 10.996076137 seconds
-OS/161 kernel: q
-Shutting down.
-VMSTATS:
-VMSTAT                TLB Faults =        402
-VMSTAT      TLB Faults with Free =         64
-VMSTAT   TLB Faults with Replace =        338
-VMSTAT         TLB Invalidations =          1
-VMSTAT               TLB Reloads =         10
-VMSTAT      Page Faults (Zeroed) =          2
-VMSTAT        Page Faults (Disk) =        390
-VMSTAT      Page Faults from ELF =        390
-VMSTAT Page Faults from Swapfile =          0
-VMSTAT           Swapfile Writes =          0
-VMSTAT TLB Faults with Free + TLB Faults with Replace = 402
-VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 402
-VMSTAT ELF File reads + Swapfile reads = 390
-The system is halted.
-sys161: 280000650 cycles (24015790 run, 255984860 global-idle)
-sys161:   cpu0: 21642373 kern, 2373417 user, 0 idle)
-sys161: 4444 irqs 523 exns 0r/0w disk 0r/1425w console 1954r/1w/7m emufs 0r/0w net
-sys161: Elapsed real time: 11.210578 seconds (24.9765 mhz)
-sys161: Elapsed virtual time: 11.200026017 seconds (25 mhz)
------------------------------------------
-
-
-
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p uw-testbin/vm-mix1
-Checking uninitialized array1
-Checking uninitialized array2
-FAILED in file vm-mix1.c at line 107: array2[961] = 16 != 0
-Operation took 11.003941777 seconds
-OS/161 kernel:  p uw-testbin/vm-mix1
-Checking uninitialized array1
-Checking uninitialized array2
-FAILED in file vm-mix1.c at line 107: array2[961] = 16 != 0
-Operation took 11.075902000 seconds
-OS/161 kernel:  p uw-testbin/vm-mix1
-Checking uninitialized array1
-Checking uninitialized array2
-FAILED in file vm-mix1.c at line 107: array2[961] = 16 != 0
-Operation took 11.077181320 seconds
-OS/161 kernel:  q
-Shutting down.
-VMSTATS:
-VMSTAT                TLB Faults =       1206
-VMSTAT      TLB Faults with Free =        192
-VMSTAT   TLB Faults with Replace =       1014
-VMSTAT         TLB Invalidations =          3
-VMSTAT               TLB Reloads =         30
-VMSTAT      Page Faults (Zeroed) =          6
-VMSTAT        Page Faults (Disk) =       1170
-VMSTAT      Page Faults from ELF =       1170
-VMSTAT Page Faults from Swapfile =          0
-VMSTAT           Swapfile Writes =          0
-VMSTAT TLB Faults with Free + TLB Faults with Replace = 1206
-VMSTAT TLB Reloads + Page Faults (Zeroed) + Page Faults (Disk) = 1206
-VMSTAT ELF File reads + Swapfile reads = 1170
-The system is halted.
-sys161: 834509897 cycles (63330672 run, 771179225 global-idle)
-sys161:   cpu0: 56210419 kern, 7120253 user, 0 idle)
-sys161: 10911 irqs 1569 exns 0r/0w disk 0r/1815w console 5862r/1w/15m emufs 0r/0w net
-sys161: Elapsed real time: 33.378967 seconds (25.0011 mhz)
-sys161: Elapsed virtual time: 33.380395897 seconds (25 mhz)
------------
-
-=========================================================
-RUNNING ./run-batch-A3-option1 : Version 1.0
----------------------------------------------------------------
-***************  RUNNING [test-vm-big-fork] TESTS  ******************
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p uw-testbin/vm-mix1-fork
-sleep: Dropping thread <boot/menu>
-panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6639966 cycles (3476682 run, 3163284 global-idle)
-sys161:   cpu0: 3476663 kern, 19 user, 0 idle)
-sys161: 622 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.301348 seconds (22.0342 mhz)
-sys161: Elapsed virtual time: 0.265598657 seconds (25 mhz)
------------
-
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p uw-testbin/vm-mix1-fork
-sleep: Dropping thread <boot/menu>
-panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6650872 cycles (3477599 run, 3173273 global-idle)
-sys161:   cpu0: 3477580 kern, 19 user, 0 idle)
-sys161: 622 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.267206 seconds (24.8904 mhz)
-sys161: Elapsed virtual time: 0.266034897 seconds (25 mhz)
+sys161: 27991250 cycles (7470044 run, 20521206 global-idle)
+sys161:   cpu0: 7211187 kern, 258857 user, 0 idle)
+sys161: 1453 irqs 32 exns 0r/0w disk 0r/1313w console 50r/1w/7m emufs 0r/0w net
+sys161: Elapsed real time: 1.129643 seconds (24.7788 mhz)
+sys161: Elapsed virtual time: 1.119650017 seconds (25 mhz)
 -----------
 
 ---------------------------------------------------------------
-***************  RUNNING [test-vm-big-fork-exec] TESTS  ******************
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p testbin/parallelvm
-Job size approximately 58800 bytes
-Forking 24 jobs; total load 1378k
-sleep: Dropping thread <boot/menu>
-panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6460021 cycles (3423776 run, 3036245 global-idle)
-sys161:   cpu0: 3417286 kern, 6490 user, 0 idle)
-sys161: 684 irqs 76 exns 0r/0w disk 0r/755w console 18r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.259229 seconds (24.9201 mhz)
-sys161: Elapsed virtual time: 0.258400857 seconds (25 mhz)
------------
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p testbin/triplesort
-testbin/triplesort: Starting: running three copies of /testbin/sort...
-sleep: Dropping thread <boot/menu>
-panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6385003 cycles (3342569 run, 3042434 global-idle)
-sys161:   cpu0: 3340201 kern, 2368 user, 0 idle)
-sys161: 688 irqs 49 exns 0r/0w disk 0r/757w console 18r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.249883 seconds (25.552 mhz)
-sys161: Elapsed virtual time: 0.255400137 seconds (25 mhz)
------------
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p testbin/triplemat
-testbin/triplemat: Starting: running three copies of /testbin/matmult...
-sleep: Dropping thread <boot/menu>
-panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6384259 cycles (3342085 run, 3042174 global-idle)
-sys161:   cpu0: 3339691 kern, 2394 user, 0 idle)
-sys161: 687 irqs 49 exns 0r/0w disk 0r/758w console 18r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.250308 seconds (25.5056 mhz)
-sys161: Elapsed virtual time: 0.255370377 seconds (25 mhz)
------------
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p testbin/triplehuge
-testbin/triplehuge: Starting: running three copies of /testbin/huge...
-sleep: Dropping thread <boot/menu>
-panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6379070 cycles (3341689 run, 3037381 global-idle)
-sys161:   cpu0: 3339321 kern, 2368 user, 0 idle)
-sys161: 688 irqs 49 exns 0r/0w disk 0r/757w console 18r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.315118 seconds (20.2434 mhz)
-sys161: Elapsed virtual time: 0.255162800 seconds (25 mhz)
------------
-
----------------------------------------------------------------
-***************  RUNNING [test-vm-big-fork-paging] TESTS  ******************
-
-
-CS350-036's system version 036 (ASST3 #169)
-
-
-OS/161 kernel: p uw-testbin/vm-mix1-fork
-sleep: Dropping thread <boot/menu>
-panic: Assertion failed: faultaddress != 0, at ../../vm/vm_tlb.c:46 (vm_fault)
-sys161: 6504697 cycles (3209560 run, 3295137 global-idle)
-sys161:   cpu0: 3209541 kern, 19 user, 0 idle)
-sys161: 623 irqs 6 exns 0r/0w disk 0r/691w console 19r/1w/6m emufs 0r/0w net
-sys161: Elapsed real time: 0.253654 seconds (25.644 mhz)
-sys161: Elapsed virtual time: 0.260187897 seconds (25 mhz)
------------
-
-=========================================================
-/bin/rm -f SWAPFILE
+************** RUNNING [test-vm-replace] TESTS ******************
